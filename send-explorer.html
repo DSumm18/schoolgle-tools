@@ -74,34 +74,34 @@
 </head>
 <body>
 <div class="container">
-  <a href="index.html" class="back-link">\u2190 Back to Toolbox</a>
+  <a href="index.html" class="back-link">← Back to Toolbox</a>
   <div class="page-header">
     <div>
       <h1>SEND <span>Explorer</span></h1>
-      <div class="subtitle">EHCP caseload data for every local authority in England, 2018\u20132025</div>
+      <div class="subtitle">EHCP caseload data for every local authority in England, 2018–2025</div>
     </div>
     <div class="theme-toggle" role="group" aria-label="Theme">
-      <button class="ctrl-btn" onclick="setTheme('light')" id="btn-light" aria-label="Light mode">\u2600\uFE0F</button>
-      <button class="ctrl-btn" onclick="setTheme('dark')" id="btn-dark" aria-label="Dark mode">\uD83C\uDF19</button>
-      <button class="ctrl-btn" onclick="setTheme('system')" id="btn-system" aria-label="System theme">\u2699\uFE0F</button>
+      <button class="ctrl-btn" onclick="setTheme('light')" id="btn-light" aria-label="Light mode">☀️</button>
+      <button class="ctrl-btn" onclick="setTheme('dark')" id="btn-dark" aria-label="Dark mode">🌙</button>
+      <button class="ctrl-btn" onclick="setTheme('system')" id="btn-system" aria-label="System theme">⚙️</button>
     </div>
   </div>
   <div class="card">
     <h2>Choose Your Local Authority</h2>
     <label for="la-select">Local Authority</label>
-    <select id="la-select"><option value="">\u2014 Select a local authority \u2014</option></select>
+    <select id="la-select"><option value="">— Select a local authority —</option></select>
     <div class="compare-select">
       <label for="compare-select">Compare with (up to 3)</label>
-      <select id="compare-select"><option value="">\u2014 Add comparison LA \u2014</option></select>
+      <select id="compare-select"><option value="">— Add comparison LA —</option></select>
       <div class="compare-chips" id="compare-chips"></div>
     </div>
   </div>
   <div id="results" class="hidden">
     <div class="stats-grid" id="stats-grid">
-      <div class="stat-box"><div class="stat-value" id="stat-total">\u2014</div><div class="stat-label">Total EHCPs (2024-25)</div></div>
-      <div class="stat-box"><div class="stat-value" id="stat-growth">\u2014</div><div class="stat-label">Growth since 2018-19</div></div>
-      <div class="stat-box"><div class="stat-value" id="stat-rank">\u2014</div><div class="stat-label">Rank (by growth %)</div></div>
-      <div class="stat-box"><div class="stat-value" id="stat-national">\u2014</div><div class="stat-label">vs National Avg Growth</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-total">—</div><div class="stat-label">Total EHCPs (2024-25)</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-growth">—</div><div class="stat-label">Growth since 2018-19</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-rank">—</div><div class="stat-label">Rank (by growth %)</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-national">—</div><div class="stat-label">vs National Avg Growth</div></div>
     </div>
     <div class="card">
       <h2 id="trend-title">EHCP Trend</h2>
@@ -115,7 +115,7 @@
       <p class="source">Source: DfE, Education Health and Care Plans, 2024-25</p>
     </div>
     <div class="card hidden" id="compare-card">
-      <h2>LA Comparison \u2014 Total EHCPs by Year</h2>
+      <h2>LA Comparison — Total EHCPs by Year</h2>
       <div class="compare-legend" id="compare-legend"></div>
       <div id="compare-chart"></div>
       <p class="source">Source: DfE, Education Health and Care Plans, 2024-25</p>
@@ -124,7 +124,7 @@
   <div class="cta-panel">
     <h2>Want trust-wide benchmarking?</h2>
     <p>Governor-ready reports, scenario planning, and multi-academy trust SEND dashboards. Join The Staff Room Pro.</p>
-    <a href="https://schoolgle.co.uk" class="cta-btn">See the full platform \u2192</a>
+    <a href="https://schoolgle.co.uk" class="cta-btn">See the full platform →</a>
   </div>
 </div>
 <script>
@@ -320,7 +320,7 @@ function updateCompare() {
 function renderChips() {
   const el = document.getElementById('compare-chips');
   el.innerHTML = compareLAs.map((la, i) =>
-    `<div class="chip"><span>${la}</span><button onclick="removeCompare(${i})" aria-label="Remove ${la}">\u00D7</button></div>`
+    `<div class="chip"><span>${la}</span><button onclick="removeCompare(${i})" aria-label="Remove ${la}">×</button></div>`
   ).join('');
 }
 
