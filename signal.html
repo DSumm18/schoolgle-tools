@@ -858,7 +858,7 @@ calculate();
 
     const bar = document.createElement('div');
     const pct = (d.value / maxVal) * 100;
-    bar.style.cssText = `width:100%;border-radius:6px 6px 0 0;background:${d.forecast ? 'var(--error-text)' : 'var(--accent)'};opacity:${d.forecast ? '0.6' : '1'};height:0;transition:height 0.6s ease ${i * 0.08}s;`;
+    bar.style.cssText = `width:100%;min-width:20px;border-radius:6px 6px 0 0;background:${d.forecast ? '#EF4444' : '#00D4D4'};opacity:${d.forecast ? '0.7' : '1'};height:0;transition:height 0.6s ease ${i * 0.08}s;`;
     bar.dataset.height = pct + '%';
 
     const label = document.createElement('div');
@@ -877,18 +877,12 @@ calculate();
     chart.appendChild(col);
   });
 
-  // Animate on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        chart.querySelectorAll('[data-height]').forEach(bar => {
-          bar.style.height = bar.dataset.height;
-        });
-        observer.disconnect();
-      }
+  // Animate bars after short delay
+  setTimeout(() => {
+    chart.querySelectorAll('[data-height]').forEach(bar => {
+      bar.style.height = bar.dataset.height;
     });
-  }, { threshold: 0.3 });
-  observer.observe(chart);
+  }, 300);
 
   // Transport chart
   const tData = [
@@ -912,7 +906,7 @@ calculate();
 
     const bar = document.createElement('div');
     const pct = (d.value / tMax) * 100;
-    bar.style.cssText = `width:100%;max-width:60px;border-radius:6px 6px 0 0;background:${d.forecast ? 'var(--error-text)' : '#FBBF24'};opacity:${d.forecast ? '0.6' : '1'};height:0;transition:height 0.6s ease ${i * 0.1}s;`;
+    bar.style.cssText = `width:100%;max-width:80px;border-radius:6px 6px 0 0;background:${d.forecast ? '#EF4444' : '#FBBF24'};opacity:${d.forecast ? '0.7' : '1'};height:0;transition:height 0.6s ease ${i * 0.1}s;`;
     bar.dataset.height = pct + '%';
 
     const label = document.createElement('div');
@@ -931,17 +925,11 @@ calculate();
     tChart.appendChild(col);
   });
 
-  const tObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        tChart.querySelectorAll('[data-height]').forEach(bar => {
-          bar.style.height = bar.dataset.height;
-        });
-        tObs.disconnect();
-      }
+  setTimeout(() => {
+    tChart.querySelectorAll('[data-height]').forEach(bar => {
+      bar.style.height = bar.dataset.height;
     });
-  }, { threshold: 0.3 });
-  tObs.observe(tChart);
+  }, 600);
 })();
 </script>
 </body>
