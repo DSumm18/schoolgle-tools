@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Schoolgle Signal — Week 9</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;500;600;700&display=swap');
+
+  /* ===== THEME VARIABLES ===== */
+  :root {
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-display: 'Outfit', system-ui, sans-serif;
+    --max-width: 720px;
+    --radius: 16px;
+    --card-pad: 24px;
+    --accent: #00D4D4;
+    --accent-dim: rgba(0,212,212,0.12);
+    --font-size: 17px;
+  }
+
+  /* Light (Paper + Ink) */
+  [data-theme="light"] {
+    --bg: #F7F7F9;
+    --surface: #FFFFFF;
+    --elevated: #FFFFFF;
+    --text: #0B1220;
+    --muted: #465063;
+    --border: #E6E8EE;
+    --quote-bg: #F0F1F5;
+    --chip-bg: rgba(0,212,212,0.08);
+    --chip-text: #007A7A;
+    --error-bg: #FFF0F0;
+    --error-text: #CC2222;
+    --error-border: #FFCCCC;
+    --success-bg: #F0FFF4;
+    --success-text: #166534;
+    --todo-bg: #F7F7F9;
+  }
+
+  /* Dark (Midnight + Aqua) */
+  [data-theme="dark"] {
+    --bg: #070B18;
+    --surface: #0C1430;
+    --elevated: #111C3E;
+    --text: #EAF0FF;
+    --muted: #A9B4D0;
+    --border: #22305B;
+    --quote-bg: #111C3E;
+    --chip-bg: rgba(0,212,212,0.12);
+    --chip-text: #00D4D4;
+    --error-bg: rgba(204,34,34,0.1);
+    --error-text: #FF6B6B;
+    --error-border: #442222;
+    --success-bg: rgba(22,101,52,0.1);
+    --success-text: #4ADE80;
+    --todo-bg: #0C1430;
+  }
+
+  /* ===== RESET + BASE ===== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    font-size: var(--font-size);
+    line-height: 1.6;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  /* ===== LAYOUT ===== */
+  .container { max-width: var(--max-width); margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* ===== HEADER ===== */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .page-header h1 span { color: var(--accent); font-weight: 700; }
+  .page-header .date { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .ctrl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    font-family: var(--font-body);
+  }
+  .ctrl-btn:hover, .ctrl-btn:focus-visible { border-color: var(--accent); outline: none; }
+  .ctrl-btn:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+  .ctrl-btn.active { border-color: var(--accent); color: var(--accent); }
+
+  /* ===== AUDIO BAR ===== */
+  .audio-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px var(--card-pad);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .audio-bar .label { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .audio-bar audio { flex: 1; min-width: 200px; height: 36px; }
+  .transcript-toggle {
+    font-size: 12px;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    min-height: 44px;
+    padding: 8px;
+  }
+  .transcript { display: none; margin-top: 12px; font-size: 14px; color: var(--muted); line-height: 1.7; padding: 16px; background: var(--quote-bg); border-radius: 8px; }
+  .transcript.open { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--card-pad);
+    margin-bottom: 20px;
+  }
+
+  /* Section chips */
+  .chip {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+  .chip-send { background: rgba(245,158,11,0.12); color: #B45309; }
+  .chip-finance { background: rgba(16,185,129,0.12); color: #047857; }
+  .chip-ops { background: var(--accent-dim); color: var(--chip-text); }
+  .chip-compliance { background: rgba(234,179,8,0.12); color: #A16207; }
+  .chip-safeguarding { background: rgba(239,68,68,0.12); color: #B91C1C; }
+  .chip-ai { background: rgba(139,92,246,0.12); color: #6D28D9; }
+  .chip-estates { background: rgba(20,184,166,0.12); color: #0F766E; }
+  [data-theme="dark"] .chip-send { color: #FBBF24; }
+  [data-theme="dark"] .chip-finance { color: #34D399; }
+  [data-theme="dark"] .chip-compliance { color: #FACC15; }
+  [data-theme="dark"] .chip-safeguarding { color: #F87171; }
+  [data-theme="dark"] .chip-ai { color: #A78BFA; }
+  [data-theme="dark"] .chip-estates { color: #2DD4BF; }
+
+  /* Content */
+  .card h2 { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; }
+  .card .summary { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
+  .card h3 { font-size: 17px; font-weight: 600; margin: 24px 0 8px; }
+  .card p { margin-bottom: 14px; }
+  .card ul, .card ol { margin: 8px 0 14px 20px; }
+  .card li { margin-bottom: 6px; }
+  .source { font-size: 12px; color: var(--muted); font-style: italic; margin: -8px 0 14px; }
+
+  /* Quote / action boxes */
+  .action-box {
+    background: var(--quote-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+  }
+  .action-box strong { color: var(--accent); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .action-box p { margin: 6px 0 0; font-size: 15px; }
+  .action-box ul { margin: 6px 0 0 16px; font-size: 15px; }
+
+  /* To-do checklist */
+  .todo { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; }
+  .todo input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+  .todo label { font-size: 15px; cursor: pointer; }
+
+  /* ===== TOOL SPOTLIGHT ===== */
+  .tool-card {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: var(--card-pad);
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .tool-card::before {
+    content: 'TOOL OF THE WEEK';
+    position: absolute;
+    top: -11px;
+    left: 20px;
+    background: var(--accent);
+    color: #070B18;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+  .tool-card h2 { margin-top: 8px; }
+
+  /* Tool inputs */
+  .tool-input-group { margin: 16px 0; }
+  .tool-input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .tool-slider-row { display: flex; align-items: center; gap: 12px; }
+  .tool-slider-row input[type="range"] {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+  }
+  .tool-slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .tool-slider-row input[type="range"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+  .tool-value {
+    min-width: 90px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text);
+    font-family: var(--font-body);
+  }
+  .tool-value:focus-visible { border-color: var(--accent); outline: none; box-shadow: 0 0 0 2px var(--accent-dim); }
+
+  .tool-error {
+    display: none;
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin: 8px 0;
+  }
+  .tool-error.visible { display: block; }
+
+  /* Results grid */
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  @media (max-width: 480px) { .results-grid { grid-template-columns: 1fr; } }
+  .result-tile {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .result-tile .rlabel { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .result-tile .rvalue { font-size: 24px; font-weight: 700; font-family: var(--font-body); }
+  .result-tile.hero { border-color: var(--error-border); background: var(--error-bg); grid-column: 1 / -1; }
+  .result-tile.hero .rvalue { color: var(--error-text); font-size: 32px; }
+  .result-tile.monthly { }
+  .result-tile.monthly .rvalue { font-size: 20px; }
+
+  /* Benchmark bars */
+  .benchmarks { margin: 20px 0; }
+  .bench-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+  .bench-label { width: 110px; color: var(--muted); font-size: 12px; }
+  .bench-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bench-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+  .bench-val { width: 80px; text-align: right; font-size: 12px; color: var(--muted); font-family: monospace; }
+
+  /* Assumptions */
+  .assumptions {
+    margin: 16px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .assumptions summary {
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .assumptions summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .assumptions .inner { padding: 0 16px 16px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* Tool CTAs */
+  .tool-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+  .tool-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font-body);
+    min-height: 44px;
+    transition: opacity 0.2s;
+  }
+  .tool-cta-btn:hover { opacity: 0.85; }
+  .tool-cta-btn:focus-visible { box-shadow: 0 0 0 2px var(--accent); outline: none; }
+  .tool-cta-primary { background: var(--accent); color: #070B18; }
+  .tool-cta-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+
+  .pro-teaser {
+    background: var(--quote-bg);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 16px;
+  }
+  .pro-teaser strong { color: var(--accent); }
+
+  .time-saved {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    font-size: 13px;
+    color: var(--success-text);
+    background: var(--success-bg);
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 16px;
+  }
+
+  /* ===== CTA ===== */
+  .cta-section {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 32px var(--card-pad);
+    text-align: center;
+    margin-top: 32px;
+  }
+  .cta-section h2 { margin-bottom: 12px; font-family: var(--font-display); }
+  .cta-section p { color: var(--muted); margin-bottom: 20px; font-size: 15px; }
+  .cta-section .cta-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--accent);
+    color: #070B18;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    min-height: 44px;
+  }
+
+  /* ===== FOOTER ===== */
+  .page-footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .page-footer a { color: var(--accent); text-decoration: none; }
+
+  /* Print */
+  @media print {
+    body { background: #fff; color: #000; }
+    .controls, .audio-bar, .tool-ctas, .cta-section { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <div>
+      <h1>The Schoolgle <span>Signal</span></h1>
+      <div class="date">Week of 17 February 2026</div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="setTheme('light')" id="btn-light" aria-label="Light mode">☀️</button>
+      <button class="ctrl-btn" onclick="setTheme('dark')" id="btn-dark" aria-label="Dark mode">🌙</button>
+      <button class="ctrl-btn" onclick="setTheme('system')" id="btn-system" aria-label="System theme">⚙️</button>
+      <button class="ctrl-btn" onclick="adjustFont(-1)" aria-label="Decrease text size">A-</button>
+      <button class="ctrl-btn" onclick="adjustFont(0)" aria-label="Default text size">A</button>
+      <button class="ctrl-btn" onclick="adjustFont(1)" aria-label="Increase text size">A+</button>
+    </div>
+  </header>
+
+  <!-- AUDIO BAR -->
+  <div class="audio-bar">
+    <span class="label">🎧 Listen to this issue (8 mins)</span>
+    <audio controls preload="none" style="flex:1;min-width:200px;">
+      <source src="" type="audio/mpeg">
+    </audio>
+    <button class="transcript-toggle" onclick="document.querySelector('.transcript').classList.toggle('open')">Transcript ▾</button>
+    <div class="transcript">Transcript will appear here when audio is generated.</div>
+  </div>
+
+  <!-- THIS WEEK IN 60 SECONDS -->
+  <div class="card">
+    <h2>This week in 60 seconds</h2>
+    <ul>
+      <li><strong>28 Feb</strong> — Admission arrangements deadline. Confirm with your clerk today.</li>
+      <li><strong>Half-term</strong> — Site security, heating, contractor checks. Ops checklist below.</li>
+      <li><strong>Tool of the week</strong> — NI Cost Calculator. See how the April rise hits your budget.</li>
+    </ul>
+  </div>
+
+  <!-- DEEP DIVE: SEND -->
+  <div class="card">
+    <span class="chip chip-send">SEND</span>
+    <h2>SEND: the pressure point nobody can ignore</h2>
+    <p class="summary">Disabled Children's Partnership data shows the scale of family impact. The white paper is coming — here's what to watch and what to do now.</p>
+
+    <p>This week, Good Morning Britain highlighted what SEND families have been saying for years: the system pushes parents into crisis mode. Research cited in the segment (Disabled Children's Partnership) found:</p>
+    <ul>
+      <li>37% of SEND parents have quit work</li>
+      <li>34% have reduced their hours</li>
+      <li>31% rely on benefits</li>
+    </ul>
+    <p>That's not "hardship around the edges". It's a structural problem showing up as lost income across whole households.</p>
+
+    <h3>The funding still doesn't add up</h3>
+    <p>EHCPs have risen from around 240,000 (2015) to 638,700 (Jan 2025). Demand has more than doubled, and the system is paying for it in the most expensive way possible.</p>
+    <p>Independent special school places average about £61,500 per year versus ~£24,000 in state special schools — largely because capacity constraints push councils into premium provision.</p>
+    <p>High-needs spending has been rising fast and is forecast to keep climbing (IFS forecasts spending above £18bn by 2028–29). The LGA says 8 in 10 councils are at financial risk from SEND costs.</p>
+    <p class="source">Sources: IFS 2024, DfE SEN2 data, LGA briefing</p>
+
+    <h3>The SEND deficit "reset" (and why it matters)</h3>
+    <p>Government has said it will cover 90% of historic SEND deficits built up by March 2026. That helps councils' balance sheets — but it doesn't fix the engine causing the deficit in the first place.</p>
+    <p>IFS is explicit: without reform, councils were on course to build up a further ~£9bn of SEND-related debt across 2026–27 and 2027–28, plus a big in-year funding gap by 2028–29.</p>
+
+    <h3>The part that doesn't add up</h3>
+    <p>The £200 million training programme covers every teacher in England, plus TAs, FE staff, and early years workers. That's well over a million people. Works out to roughly £200 per person. A two-day specialist SEND course typically costs £300–£500 per delegate. The budget doesn't stretch.</p>
+    <p>No announcement on improving TA pay — the people who actually deliver most SEND support in mainstream classrooms.</p>
+
+    <div class="action-box">
+      <strong>Do this next</strong>
+      <ul>
+        <li>Review your SEND register and provision map — know where you stand before the white paper.</li>
+        <li>Cost your SEND provision from your own budget (not top-up). You'll need this number.</li>
+        <li>Brief governors with a one-page SEND summary: numbers, costs, gaps.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TOOL OF THE WEEK -->
+  <div class="tool-card" id="ni-calc">
+    <h2>NI Cost Calculator</h2>
+    <p class="summary">How much does the April employer NI rise cost your school? Enter your numbers.</p>
+
+    <div class="tool-input-group">
+      <label for="headcount">Number of staff (headcount)</label>
+      <div class="tool-slider-row">
+        <input type="range" id="headcount" min="0" max="500" value="80" aria-label="Staff headcount">
+        <input type="number" class="tool-value" id="headcount-val" value="80" min="0" max="5000" aria-label="Staff headcount value">
+      </div>
+    </div>
+
+    <div class="tool-input-group">
+      <label for="salary">Average salary (blended across all staff)</label>
+      <div class="tool-slider-row">
+        <input type="range" id="salary" min="0" max="80000" step="500" value="28000" aria-label="Average salary">
+        <input type="number" class="tool-value" id="salary-val" value="28000" min="0" max="250000" aria-label="Average salary value">
+      </div>
+    </div>
+
+    <div class="tool-error" id="calc-error" role="alert"></div>
+
+    <div class="results-grid" id="calc-results">
+      <div class="result-tile">
+        <div class="rlabel">Total payroll</div>
+        <div class="rvalue" id="r-payroll">£2,240,000</div>
+      </div>
+      <div class="result-tile">
+        <div class="rlabel">Current NI (13.8%)</div>
+        <div class="rvalue" id="r-current">£309,120</div>
+      </div>
+      <div class="result-tile">
+        <div class="rlabel">New NI (15.0%)</div>
+        <div class="rvalue" id="r-new">£336,000</div>
+      </div>
+      <div class="result-tile hero">
+        <div class="rlabel">Additional cost per year</div>
+        <div class="rvalue" id="r-annual">£26,880</div>
+      </div>
+      <div class="result-tile monthly">
+        <div class="rlabel">Additional cost per month</div>
+        <div class="rvalue" id="r-monthly">£2,240</div>
+      </div>
+    </div>
+
+    <!-- Benchmarks -->
+    <div class="benchmarks">
+      <div class="bench-row">
+        <span class="bench-label">Small (30 staff)</span>
+        <div class="bench-track"><div class="bench-fill" id="b-small" style="width:16%;background:var(--accent);"></div></div>
+        <span class="bench-val">£10,080</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-label">Medium (80 staff)</span>
+        <div class="bench-track"><div class="bench-fill" id="b-med" style="width:43%;background:var(--accent);"></div></div>
+        <span class="bench-val">£26,880</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-label">Large (150 staff)</span>
+        <div class="bench-track"><div class="bench-fill" id="b-large" style="width:80%;background:var(--accent);"></div></div>
+        <span class="bench-val">£50,400</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-label" style="font-weight:600;color:var(--text);">Your school</span>
+        <div class="bench-track"><div class="bench-fill" id="b-you" style="width:43%;background:var(--error-text);"></div></div>
+        <span class="bench-val" id="b-you-val" style="font-weight:600;color:var(--error-text);">£26,880</span>
+      </div>
+    </div>
+
+    <!-- Assumptions -->
+    <details class="assumptions">
+      <summary>How this is calculated</summary>
+      <div class="inner">
+        <p><strong>Formula:</strong> Staff × Average Salary × 1.2% (rate delta)</p>
+        <p><strong>Constants:</strong> Old rate 13.8% → New rate 15.0% = 1.2pp increase</p>
+        <p><strong>Assumptions:</strong></p>
+        <ul>
+          <li>Estimate based on average pay and total payroll</li>
+          <li>Does not account for NI thresholds, employment allowance, pay distribution, or NI category differences</li>
+          <li>Outputs are for planning/budgeting only — verify with your payroll provider</li>
+        </ul>
+        <p><strong>Version:</strong> v1.0 — Simplified Payroll Delta Model</p>
+      </div>
+    </details>
+
+    <!-- CTAs -->
+    <div class="tool-ctas">
+      <button class="tool-cta-btn tool-cta-primary" onclick="alert('Email feature coming soon')">📧 Email me this result</button>
+      <button class="tool-cta-btn tool-cta-secondary" onclick="resetCalc()">↺ Reset</button>
+      <a href="#" class="tool-cta-btn tool-cta-secondary" style="text-decoration:none;">🚩 Report an issue</a>
+    </div>
+
+    <div class="pro-teaser">
+      <strong>Pro version</strong> adds saved scenarios (best/likely/worst), trust-wide roll-up, PDF export, benchmarks, and governor-ready narrative. Coming to the Schoolgle Toolbox.
+    </div>
+
+    <div class="time-saved">⏱ Time saved using this tool: ~4 hours of spreadsheet work</div>
+  </div>
+
+  <!-- RADAR ITEMS -->
+  <div class="card">
+    <span class="chip chip-estates">Estates</span>
+    <h2>DfE: "Manage Your Education Estate" is rolling out</h2>
+    <p class="summary">New digital service consolidating estates guidance, tools, and funding applications.</p>
+    <p>DfE is launching a new digital service in February 2026 to bring estates guidance, tools, funding and data into one place. If you're in a responsible body role, getting in early matters — early users shape what it becomes.</p>
+    <div class="action-box">
+      <strong>Do this next</strong>
+      <ul><li>Register for early access and provide feedback during the rollout window.</li></ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="chip chip-send">SEND</span>
+    <h2>SEND transport: the silent budget-wrecker</h2>
+    <p class="summary">Costs could rise to £3.4bn/year by 2030/31 — up from ~£2bn recently.</p>
+    <p>Councils are warning that SEND transport costs could rise to £3.4bn a year by 2030/31 if nothing changes — up from roughly £2bn recently. Longer journeys are the symptom. Lack of local provision is the disease.</p>
+    <div class="action-box">
+      <strong>Do this next</strong>
+      <ul><li>Check what your LA spends on transport for your pupils vs. the provision itself. If transport exceeds provision, raise it at your next SEND review.</li></ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="chip chip-ai">AI &amp; Cyber</span>
+    <h2>Cybersecurity policies need an AI update</h2>
+    <p class="summary">Most school AUPs were written before generative AI existed.</p>
+    <p>Students are using ChatGPT, Gemini, and dozens of other tools on school networks and devices. The filtering hasn't kept pace.</p>
+    <div class="action-box">
+      <strong>Do this next</strong>
+      <ul><li>Check whether your AUP mentions AI tools by name. If not, it's out of date.</li></ul>
+    </div>
+  </div>
+
+  <!-- OPS CHECKLIST -->
+  <div class="card">
+    <span class="chip chip-ops">Operations</span>
+    <h2>Ops checklist: half-term</h2>
+    <p class="summary">Quick checks before you leave site.</p>
+
+    <h3>Buildings</h3>
+    <div class="todo"><input type="checkbox" id="t1"><label for="t1">Heating on frost protection (not off). Burst pipes cost thousands.</label></div>
+    <div class="todo"><input type="checkbox" id="t2"><label for="t2">External doors and windows secured. Peak break-in time.</label></div>
+    <div class="todo"><input type="checkbox" id="t3"><label for="t3">Contractors on site? Current DBS + lone working confirmed.</label></div>
+
+    <h3>Safeguarding</h3>
+    <div class="todo"><input type="checkbox" id="t4"><label for="t4">Vulnerable pupils identified. Family + social worker contacts current.</label></div>
+    <div class="todo"><input type="checkbox" id="t5"><label for="t5">External providers on site? Safeguarding arrangements confirmed.</label></div>
+
+    <h3>Data</h3>
+    <div class="todo"><input type="checkbox" id="t6"><label for="t6">Census validation errors from January resolved.</label></div>
+    <div class="todo"><input type="checkbox" id="t7"><label for="t7">Spring attendance data pulled for governors / Ofsted prep.</label></div>
+  </div>
+
+  <!-- THE QUESTION -->
+  <div class="card">
+    <h2>The question leaders should ask out loud</h2>
+    <p><strong>Is mainstream SEND inclusion a genuine improvement for children, or a cost-reduction strategy that needs better resourcing to work?</strong></p>
+    <p>The answer depends on which school you're in. We'd like to hear from people living it.</p>
+  </div>
+
+  <!-- USEFUL READS -->
+  <div class="card">
+    <h2>Useful reads behind the numbers</h2>
+    <ul>
+      <li><a href="https://www.theguardian.com/education/2026/feb/19/councils-england-radical-means-testing-send-school-transport" target="_blank" rel="noopener">Councils call for 'radical' means testing of SEND transport</a> — The Guardian</li>
+      <li><a href="https://www.theguardian.com/education/2026/feb/13/reeves-reassure-mps-public-finances-send-costs" target="_blank" rel="noopener">Reeves urged to reassure MPs over £6bn-a-year SEND costs</a> — The Guardian</li>
+      <li><a href="https://www.ft.com/content/send-special-needs-unaffordable" target="_blank" rel="noopener">Schools warn rising SEND costs are unaffordable</a> — Financial Times, Nov 2025</li>
+    </ul>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2>The White Paper is coming.</h2>
+    <p>When it drops, we'll publish a practical breakdown within 48 hours. What changes. What doesn't. What the funding covers.</p>
+    <a href="https://schoolgle.co.uk" class="cta-btn">Sign up — it's free</a>
+  </div>
+
+  <footer class="page-footer">
+    <p>The Schoolgle Signal — weekly intelligence for school leaders.</p>
+    <p>© 2026 <a href="https://schoolgle.co.uk">Schoolgle</a> · <a href="#">Report an issue</a> · <a href="#">Unsubscribe</a></p>
+  </footer>
+
+</div>
+
+<script>
+// ===== THEME =====
+function setTheme(mode) {
+  document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+  if (mode === 'system') {
+    const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', sys);
+    document.getElementById('btn-system').classList.add('active');
+    localStorage.setItem('signal-theme', 'system');
+  } else {
+    document.documentElement.setAttribute('data-theme', mode);
+    document.getElementById('btn-' + mode).classList.add('active');
+    localStorage.setItem('signal-theme', mode);
+  }
+}
+// Init theme
+(function() {
+  const saved = localStorage.getItem('signal-theme') || 'light';
+  setTheme(saved);
+})();
+
+// ===== FONT SIZE =====
+const sizes = [15, 17, 19];
+let sizeIdx = 1;
+function adjustFont(dir) {
+  if (dir === 0) sizeIdx = 1;
+  else sizeIdx = Math.max(0, Math.min(2, sizeIdx + dir));
+  document.documentElement.style.setProperty('--font-size', sizes[sizeIdx] + 'px');
+}
+
+// ===== NI CALCULATOR =====
+const OLD_RATE = 0.138;
+const NEW_RATE = 0.150;
+const DELTA = 0.012;
+const MAX_HEADCOUNT = 5000;
+const MAX_SALARY = 250000;
+
+const hSlider = document.getElementById('headcount');
+const hVal = document.getElementById('headcount-val');
+const sSlider = document.getElementById('salary');
+const sVal = document.getElementById('salary-val');
+const errEl = document.getElementById('calc-error');
+const resultsEl = document.getElementById('calc-results');
+
+function fmt(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
+
+function validate(headcount, salary) {
+  if (isNaN(headcount) || isNaN(salary)) return 'Please enter valid numbers.';
+  if (headcount < 0) return 'Headcount must be 0 or more.';
+  if (!Number.isInteger(headcount)) return 'Headcount must be a whole number.';
+  if (salary < 0) return 'Salary must be 0 or more.';
+  if (headcount > MAX_HEADCOUNT) return 'Headcount too high (maximum ' + MAX_HEADCOUNT + ').';
+  if (salary > MAX_SALARY) return 'Salary too high (maximum £' + MAX_SALARY.toLocaleString() + ').';
+  return null;
+}
+
+function calculate() {
+  const h = parseInt(hVal.value);
+  const s = parseFloat(sVal.value);
+  const err = validate(h, s);
+
+  if (err) {
+    errEl.textContent = err;
+    errEl.classList.add('visible');
+    resultsEl.style.opacity = '0.3';
+    return;
+  }
+  errEl.classList.remove('visible');
+  resultsEl.style.opacity = '1';
+
+  const payroll = h * s;
+  const currentNI = payroll * OLD_RATE;
+  const newNI = payroll * NEW_RATE;
+  const additional = payroll * DELTA;
+  const monthly = additional / 12;
+
+  document.getElementById('r-payroll').textContent = fmt(payroll);
+  document.getElementById('r-current').textContent = fmt(currentNI);
+  document.getElementById('r-new').textContent = fmt(newNI);
+  document.getElementById('r-annual').textContent = fmt(additional);
+  document.getElementById('r-monthly').textContent = fmt(monthly);
+
+  // Benchmarks
+  const maxBar = 250 * 55000 * DELTA;
+  const benchmarks = [
+    { el: 'b-small', val: 30 * 28000 * DELTA },
+    { el: 'b-med', val: 80 * 28000 * DELTA },
+    { el: 'b-large', val: 150 * 28000 * DELTA },
+  ];
+  benchmarks.forEach(b => {
+    document.getElementById(b.el).style.width = (b.val / maxBar * 100) + '%';
+  });
+  document.getElementById('b-you').style.width = (additional / maxBar * 100) + '%';
+  document.getElementById('b-you-val').textContent = fmt(additional);
+}
+
+function resetCalc() {
+  hSlider.value = 80; hVal.value = 80;
+  sSlider.value = 28000; sVal.value = 28000;
+  calculate();
+}
+
+// Sync slider ↔ input
+hSlider.addEventListener('input', () => { hVal.value = hSlider.value; calculate(); });
+hVal.addEventListener('input', () => { hSlider.value = Math.min(500, Math.max(0, hVal.value)); calculate(); });
+sSlider.addEventListener('input', () => { sVal.value = sSlider.value; calculate(); });
+sVal.addEventListener('input', () => { sSlider.value = Math.min(80000, Math.max(0, sVal.value)); calculate(); });
+
+calculate();
+</script>
+</body>
+</html>
