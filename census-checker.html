@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Census Readiness Checker — Schoolgle Toolbox</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;500;600;700&display=swap');
+
+  :root {
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-display: 'Outfit', system-ui, sans-serif;
+    --max-width: 720px;
+    --radius: 16px;
+    --card-pad: 24px;
+    --accent: #00D4D4;
+    --accent-dim: rgba(0,212,212,0.12);
+    --font-size: 17px;
+  }
+
+  [data-theme="light"] {
+    --bg: #F7F7F9;
+    --surface: #FFFFFF;
+    --elevated: #FFFFFF;
+    --text: #0B1220;
+    --muted: #465063;
+    --border: #E6E8EE;
+    --quote-bg: #F0F1F5;
+    --chip-bg: rgba(0,212,212,0.08);
+    --chip-text: #007A7A;
+    --error-bg: #FFF0F0;
+    --error-text: #CC2222;
+    --error-border: #FFCCCC;
+    --success-bg: #F0FFF4;
+    --success-text: #166534;
+    --warning-bg: #FFFBEB;
+    --warning-text: #A16207;
+    --warning-border: #FDE68A;
+  }
+
+  [data-theme="dark"] {
+    --bg: #070B18;
+    --surface: #0C1430;
+    --elevated: #111C3E;
+    --text: #EAF0FF;
+    --muted: #A9B4D0;
+    --border: #22305B;
+    --quote-bg: #111C3E;
+    --chip-bg: rgba(0,212,212,0.12);
+    --chip-text: #00D4D4;
+    --error-bg: rgba(204,34,34,0.1);
+    --error-text: #FF6B6B;
+    --error-border: #442222;
+    --success-bg: rgba(22,101,52,0.1);
+    --success-text: #4ADE80;
+    --warning-bg: rgba(161,98,7,0.1);
+    --warning-text: #FBBF24;
+    --warning-border: #4A3500;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    font-size: var(--font-size);
+    line-height: 1.6;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .container { max-width: var(--max-width); margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* Header */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .page-header h1 span { color: var(--accent); font-weight: 700; }
+  .page-header .date { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .back-link { font-size: 13px; color: var(--accent); text-decoration: none; display: inline-block; margin-bottom: 8px; }
+  .back-link:hover { text-decoration: underline; }
+
+  /* Controls */
+  .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .ctrl-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; min-height: 44px; padding: 8px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: border-color 0.2s; font-family: var(--font-body);
+  }
+  .ctrl-btn:hover, .ctrl-btn:focus-visible { border-color: var(--accent); outline: none; }
+  .ctrl-btn:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+  .ctrl-btn.active { border-color: var(--accent); color: var(--accent); }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--card-pad);
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+  .card .summary { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
+
+  /* Chips */
+  .chip {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+  }
+  .chip-pupil { background: rgba(14,165,233,0.12); color: #0284C7; }
+  .chip-attendance { background: rgba(245,158,11,0.12); color: #B45309; }
+  .chip-workforce { background: rgba(139,92,246,0.12); color: #6D28D9; }
+  .chip-school { background: rgba(16,185,129,0.12); color: #047857; }
+  [data-theme="dark"] .chip-pupil { color: #38BDF8; }
+  [data-theme="dark"] .chip-attendance { color: #FBBF24; }
+  [data-theme="dark"] .chip-workforce { color: #A78BFA; }
+  [data-theme="dark"] .chip-school { color: #34D399; }
+
+  /* Checklist items */
+  .check-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input[type="checkbox"] {
+    width: 22px; height: 22px; margin-top: 2px; accent-color: var(--accent);
+    flex-shrink: 0; cursor: pointer;
+  }
+  .check-item input[type="checkbox"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .check-item label {
+    font-size: 15px; cursor: pointer; flex: 1; line-height: 1.5;
+    min-height: 44px; display: flex; align-items: center;
+  }
+  .check-item.checked label { color: var(--muted); text-decoration: line-through; }
+
+  /* Progress / Score */
+  .score-card {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: var(--card-pad);
+    margin-bottom: 20px;
+    text-align: center;
+    position: sticky;
+    top: 12px;
+    z-index: 10;
+  }
+  .score-headline {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .score-sub { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
+  .progress-track {
+    width: 100%;
+    height: 12px;
+    background: var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s ease, background 0.4s ease;
+    width: 0%;
+  }
+  .rag-label {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+  }
+  .rag-green { background: var(--success-bg); color: var(--success-text); }
+  .rag-amber { background: var(--warning-bg); color: var(--warning-text); }
+  .rag-red { background: var(--error-bg); color: var(--error-text); }
+
+  /* Key dates */
+  .dates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  @media (max-width: 480px) { .dates-grid { grid-template-columns: 1fr; } }
+  .date-tile {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .date-tile .dlabel { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .date-tile .dvalue { font-size: 16px; font-weight: 600; }
+  .date-tile.next { border-color: var(--accent); }
+  .date-tile.next .dlabel { color: var(--accent); }
+  .date-tile.past { opacity: 0.5; }
+  .date-tile .countdown { font-size: 12px; color: var(--accent); margin-top: 2px; }
+
+  /* Actions required */
+  .actions-list {
+    margin-top: 16px;
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: none;
+  }
+  .actions-list.visible { display: block; }
+  .actions-list h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--error-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .actions-list ul { margin: 0 0 0 16px; font-size: 14px; color: var(--error-text); }
+  .actions-list li { margin-bottom: 4px; }
+
+  /* CTA */
+  .cta-section {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 32px var(--card-pad);
+    text-align: center;
+    margin-top: 32px;
+  }
+  .cta-section h2 { margin-bottom: 12px; font-family: var(--font-display); }
+  .cta-section p { color: var(--muted); margin-bottom: 20px; font-size: 15px; }
+  .cta-btn {
+    display: inline-block; padding: 14px 32px; background: var(--accent); color: #070B18;
+    font-weight: 600; font-size: 15px; border-radius: 8px; text-decoration: none; min-height: 44px;
+  }
+  .cta-btn:focus-visible { box-shadow: 0 0 0 3px var(--accent); outline: none; }
+
+  /* Tool buttons */
+  .tool-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+  .tool-cta-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border: none; font-family: var(--font-body); min-height: 44px; transition: opacity 0.2s;
+  }
+  .tool-cta-btn:hover { opacity: 0.85; }
+  .tool-cta-btn:focus-visible { box-shadow: 0 0 0 2px var(--accent); outline: none; }
+  .tool-cta-primary { background: var(--accent); color: #070B18; }
+  .tool-cta-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+
+  .time-saved {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px; font-size: 13px; color: var(--success-text); background: var(--success-bg);
+    border-radius: 8px; font-weight: 600; margin-top: 16px;
+  }
+
+  /* Footer */
+  .page-footer {
+    text-align: center; font-size: 12px; color: var(--muted);
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);
+  }
+  .page-footer a { color: var(--accent); text-decoration: none; }
+
+  /* Print */
+  @media print {
+    .controls, .tool-ctas, .cta-section, .score-card { position: static; }
+    body { background: #fff; color: #000; }
+    .check-item.checked label { text-decoration: line-through; color: #999; }
+  }
+
+  /* Section toggle */
+  .section-toggle {
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+    min-height: 44px;
+  }
+  .section-toggle .toggle-icon { transition: transform 0.2s; font-size: 14px; color: var(--muted); }
+  .section-toggle .toggle-icon.open { transform: rotate(180deg); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <div>
+      <a href="index.html" class="back-link">← Back to Toolbox</a>
+      <h1>Census Readiness <span>Checker</span></h1>
+      <div class="date">School Census Self-Audit Tool</div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="setTheme('light')" id="btn-light" aria-label="Light mode">☀️</button>
+      <button class="ctrl-btn" onclick="setTheme('dark')" id="btn-dark" aria-label="Dark mode">🌙</button>
+      <button class="ctrl-btn" onclick="setTheme('system')" id="btn-system" aria-label="System theme">⚙️</button>
+    </div>
+  </header>
+
+  <!-- KEY DATES -->
+  <div class="card">
+    <h2>📅 Key Census Dates 2025–26</h2>
+    <p class="summary">Know your deadlines. Census submissions that miss the window cause funding issues.</p>
+    <div class="dates-grid" id="dates-grid"></div>
+  </div>
+
+  <!-- SCORE CARD (sticky) -->
+  <div class="score-card" id="score-card">
+    <div class="score-headline" id="score-pct">0% ready</div>
+    <div class="score-sub" id="score-sub">0 of 20 checks completed</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <span class="rag-label rag-red" id="rag-label">Not Started</span>
+  </div>
+
+  <!-- SECTION 1: Pupil Data -->
+  <div class="card" id="section-pupil">
+    <span class="chip chip-pupil">Pupil Data</span>
+    <div class="section-toggle" onclick="toggleSection('pupil')" role="button" tabindex="0" aria-expanded="true" aria-controls="checks-pupil">
+      <h2>Pupil Data Checks</h2>
+      <span class="toggle-icon open" id="icon-pupil">▼</span>
+    </div>
+    <div id="checks-pupil">
+      <div class="check-item"><input type="checkbox" id="c1" onchange="updateScore()"><label for="c1">All pupils on roll have a valid UPN (13 characters, correct format)</label></div>
+      <div class="check-item"><input type="checkbox" id="c2" onchange="updateScore()"><label for="c2">No duplicate UPNs exist in your data</label></div>
+      <div class="check-item"><input type="checkbox" id="c3" onchange="updateScore()"><label for="c3">All pupils have a valid date of birth (age 4–19 for mainstream)</label></div>
+      <div class="check-item"><input type="checkbox" id="c4" onchange="updateScore()"><label for="c4">All pupils have ethnicity recorded (or "refused" explicitly marked)</label></div>
+      <div class="check-item"><input type="checkbox" id="c5" onchange="updateScore()"><label for="c5">All pupils have a valid first language recorded</label></div>
+      <div class="check-item"><input type="checkbox" id="c6" onchange="updateScore()"><label for="c6">FSM eligibility flags match known claimants</label></div>
+      <div class="check-item"><input type="checkbox" id="c7" onchange="updateScore()"><label for="c7">SEN provision type recorded for all SEN pupils (K or E)</label></div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Attendance -->
+  <div class="card" id="section-attendance">
+    <span class="chip chip-attendance">Attendance</span>
+    <div class="section-toggle" onclick="toggleSection('attendance')" role="button" tabindex="0" aria-expanded="true" aria-controls="checks-attendance">
+      <h2>Attendance Checks</h2>
+      <span class="toggle-icon open" id="icon-attendance">▼</span>
+    </div>
+    <div id="checks-attendance">
+      <div class="check-item"><input type="checkbox" id="c8" onchange="updateScore()"><label for="c8">No pupil has more than 100% attendance recorded</label></div>
+      <div class="check-item"><input type="checkbox" id="c9" onchange="updateScore()"><label for="c9">Persistent absence (&lt;90%) pupils flagged and reviewed</label></div>
+      <div class="check-item"><input type="checkbox" id="c10" onchange="updateScore()"><label for="c10">Authorised/unauthorised absence codes used correctly</label></div>
+      <div class="check-item"><input type="checkbox" id="c11" onchange="updateScore()"><label for="c11">No sessions recorded for excluded pupils during exclusion periods</label></div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Workforce -->
+  <div class="card" id="section-workforce">
+    <span class="chip chip-workforce">Workforce</span>
+    <div class="section-toggle" onclick="toggleSection('workforce')" role="button" tabindex="0" aria-expanded="true" aria-controls="checks-workforce">
+      <h2>Workforce Checks</h2>
+      <span class="toggle-icon open" id="icon-workforce">▼</span>
+    </div>
+    <div id="checks-workforce">
+      <div class="check-item"><input type="checkbox" id="c12" onchange="updateScore()"><label for="c12">All teaching staff have valid QTS status recorded</label></div>
+      <div class="check-item"><input type="checkbox" id="c13" onchange="updateScore()"><label for="c13">Contract types correctly categorised (permanent, fixed-term, agency)</label></div>
+      <div class="check-item"><input type="checkbox" id="c14" onchange="updateScore()"><label for="c14">Working hours sum correctly for each staff member</label></div>
+      <div class="check-item"><input type="checkbox" id="c15" onchange="updateScore()"><label for="c15">No duplicate staff records exist</label></div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: School Details -->
+  <div class="card" id="section-school">
+    <span class="chip chip-school">School Details</span>
+    <div class="section-toggle" onclick="toggleSection('school')" role="button" tabindex="0" aria-expanded="true" aria-controls="checks-school">
+      <h2>School Detail Checks</h2>
+      <span class="toggle-icon open" id="icon-school">▼</span>
+    </div>
+    <div id="checks-school">
+      <div class="check-item"><input type="checkbox" id="c16" onchange="updateScore()"><label for="c16">School name matches GIAS (Get Information About Schools)</label></div>
+      <div class="check-item"><input type="checkbox" id="c17" onchange="updateScore()"><label for="c17">URN matches GIAS record</label></div>
+      <div class="check-item"><input type="checkbox" id="c18" onchange="updateScore()"><label for="c18">Phase of education matches actual provision</label></div>
+      <div class="check-item"><input type="checkbox" id="c19" onchange="updateScore()"><label for="c19">Governance type is current and correct</label></div>
+      <div class="check-item"><input type="checkbox" id="c20" onchange="updateScore()"><label for="c20">Head teacher details are up to date</label></div>
+    </div>
+  </div>
+
+  <!-- ACTIONS REQUIRED -->
+  <div class="actions-list" id="actions-list">
+    <h3>⚠️ Action Required</h3>
+    <ul id="actions-ul"></ul>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="tool-ctas">
+    <button class="tool-cta-btn tool-cta-primary" onclick="printChecklist()">🖨️ Print checklist</button>
+    <button class="tool-cta-btn tool-cta-secondary" onclick="resetAll()">↺ Reset all</button>
+    <button class="tool-cta-btn tool-cta-secondary" onclick="checkAll()">✓ Check all</button>
+  </div>
+
+  <div class="time-saved">⏱ Time saved using this tool: ~3 hours of manual audit</div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2>Want automated census validation?</h2>
+    <p>Join The Staff Room Pro for real-time data quality checks against your MIS data. Catch errors before they cause funding clawbacks.</p>
+    <a href="https://schoolgle.co.uk" class="cta-btn">Join The Staff Room Pro →</a>
+  </div>
+
+  <footer class="page-footer">
+    <p>Census Readiness Checker — part of the <a href="index.html">Schoolgle Toolbox</a>.</p>
+    <p>Based on <a href="https://www.gov.uk/guidance/complete-the-school-census" target="_blank" rel="noopener">DfE School Census guidance</a>. For reference only — always verify with your MIS provider.</p>
+    <p>© 2026 <a href="https://schoolgle.co.uk">Schoolgle</a></p>
+  </footer>
+
+</div>
+
+<script>
+// ===== THEME =====
+function setTheme(mode) {
+  document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+  if (mode === 'system') {
+    const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', sys);
+    document.getElementById('btn-system').classList.add('active');
+    localStorage.setItem('census-theme', 'system');
+  } else {
+    document.documentElement.setAttribute('data-theme', mode);
+    document.getElementById('btn-' + mode).classList.add('active');
+    localStorage.setItem('census-theme', mode);
+  }
+}
+(function() { setTheme(localStorage.getItem('census-theme') || 'light'); })();
+
+// ===== KEY DATES =====
+function getThirdThursday(year, month) {
+  const d = new Date(year, month, 1);
+  const day = d.getDay();
+  let first = day <= 4 ? (4 - day + 1) : (11 - day + 4 + 1);
+  return new Date(year, month, first + 14);
+}
+function getFirstThursday(year, month) {
+  const d = new Date(year, month, 1);
+  const day = d.getDay();
+  let first = day <= 4 ? (4 - day + 1) : (11 - day + 4 + 1);
+  return new Date(year, month, first);
+}
+
+(function() {
+  const now = new Date();
+  const dates = [
+    { label: 'Spring Census 2026', date: getThirdThursday(2026, 0) },
+    { label: 'Summer Census 2026', date: getThirdThursday(2026, 4) },
+    { label: 'Autumn Census 2026', date: getFirstThursday(2026, 9) },
+    { label: 'Spring Census 2027', date: getThirdThursday(2027, 0) },
+  ];
+  const grid = document.getElementById('dates-grid');
+  let foundNext = false;
+  dates.forEach(d => {
+    const past = d.date < now;
+    const isNext = !past && !foundNext;
+    if (isNext) foundNext = true;
+    const diff = Math.ceil((d.date - now) / 86400000);
+    const tile = document.createElement('div');
+    tile.className = 'date-tile' + (past ? ' past' : '') + (isNext ? ' next' : '');
+    tile.innerHTML = `<div class="dlabel">${d.label}</div>
+      <div class="dvalue">${d.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+      ${past ? '<div class="countdown">Passed</div>' : `<div class="countdown">${diff} days away${isNext ? ' — NEXT' : ''}</div>`}`;
+    grid.appendChild(tile);
+  });
+})();
+
+// ===== SCORE =====
+const TOTAL = 20;
+const LABELS = {
+  c1: 'Valid UPNs for all pupils',
+  c2: 'No duplicate UPNs',
+  c3: 'Valid dates of birth',
+  c4: 'Ethnicity recorded',
+  c5: 'First language recorded',
+  c6: 'FSM flags match claimants',
+  c7: 'SEN provision types recorded',
+  c8: 'No >100% attendance',
+  c9: 'Persistent absence reviewed',
+  c10: 'Absence codes correct',
+  c11: 'No sessions during exclusions',
+  c12: 'QTS status recorded',
+  c13: 'Contract types correct',
+  c14: 'Working hours correct',
+  c15: 'No duplicate staff',
+  c16: 'School name matches GIAS',
+  c17: 'URN matches GIAS',
+  c18: 'Phase matches provision',
+  c19: 'Governance type current',
+  c20: 'Head teacher details current',
+};
+
+function updateScore() {
+  let checked = 0;
+  const unchecked = [];
+  for (let i = 1; i <= TOTAL; i++) {
+    const cb = document.getElementById('c' + i);
+    const item = cb.closest('.check-item');
+    if (cb.checked) {
+      checked++;
+      item.classList.add('checked');
+    } else {
+      item.classList.remove('checked');
+      unchecked.push(LABELS['c' + i]);
+    }
+  }
+  const pct = Math.round((checked / TOTAL) * 100);
+  document.getElementById('score-pct').textContent = pct + '% ready';
+  document.getElementById('score-sub').textContent = checked + ' of ' + TOTAL + ' checks completed';
+
+  const fill = document.getElementById('progress-fill');
+  fill.style.width = pct + '%';
+
+  const rag = document.getElementById('rag-label');
+  if (pct >= 100) {
+    fill.style.background = '#16A34A';
+    rag.className = 'rag-label rag-green';
+    rag.textContent = '✅ Ready to Submit';
+  } else if (pct > 90) {
+    fill.style.background = '#16A34A';
+    rag.className = 'rag-label rag-green';
+    rag.textContent = 'Green — Nearly There';
+  } else if (pct >= 70) {
+    fill.style.background = '#D97706';
+    rag.className = 'rag-label rag-amber';
+    rag.textContent = 'Amber — Needs Attention';
+  } else {
+    fill.style.background = '#DC2626';
+    rag.className = 'rag-label rag-red';
+    rag.textContent = pct === 0 ? 'Not Started' : 'Red — Significant Gaps';
+  }
+
+  // Actions list
+  const al = document.getElementById('actions-list');
+  const ul = document.getElementById('actions-ul');
+  if (unchecked.length > 0 && checked > 0) {
+    al.classList.add('visible');
+    ul.innerHTML = unchecked.map(t => '<li>' + t + '</li>').join('');
+  } else {
+    al.classList.remove('visible');
+  }
+
+  // Save state
+  const state = {};
+  for (let i = 1; i <= TOTAL; i++) state['c' + i] = document.getElementById('c' + i).checked;
+  localStorage.setItem('census-state', JSON.stringify(state));
+}
+
+// Restore state
+(function() {
+  try {
+    const state = JSON.parse(localStorage.getItem('census-state'));
+    if (state) {
+      for (let i = 1; i <= TOTAL; i++) {
+        if (state['c' + i]) document.getElementById('c' + i).checked = true;
+      }
+      updateScore();
+    }
+  } catch(e) {}
+})();
+
+// ===== SECTION TOGGLE =====
+function toggleSection(name) {
+  const el = document.getElementById('checks-' + name);
+  const icon = document.getElementById('icon-' + name);
+  if (el.style.display === 'none') {
+    el.style.display = '';
+    icon.classList.add('open');
+  } else {
+    el.style.display = 'none';
+    icon.classList.remove('open');
+  }
+}
+
+// ===== ACTIONS =====
+function resetAll() {
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('c' + i).checked = false;
+  localStorage.removeItem('census-state');
+  updateScore();
+}
+function checkAll() {
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('c' + i).checked = true;
+  updateScore();
+}
+function printChecklist() { window.print(); }
+</script>
+</body>
+</html>
