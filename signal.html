@@ -622,9 +622,38 @@
     <h2>SEND transport: the silent budget-wrecker</h2>
     <p class="summary">Costs could rise to £3.4bn/year by 2030/31 — up from ~£2bn recently.</p>
     <p>Councils are warning that SEND transport costs could rise to £3.4bn a year by 2030/31 if nothing changes — up from roughly £2bn recently. Longer journeys are the symptom. Lack of local provision is the disease.</p>
+
+    <!-- Animated SEND spending trend -->
+    <div style="margin:24px 0;padding:20px;background:var(--bg);border:1px solid var(--border);border-radius:12px;">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">High-needs SEND spending — England (£bn, real terms)</div>
+      <div id="send-chart" style="display:flex;align-items:flex-end;gap:6px;height:180px;padding-bottom:24px;position:relative;">
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">Sources: IFS Dec 2025, DfE high needs data. 2028-29 is OBR/IFS forecast.</div>
+    </div>
+
+    <!-- Transport cost trend -->
+    <div style="margin:24px 0;padding:20px;background:var(--bg);border:1px solid var(--border);border-radius:12px;">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">SEND transport costs (£bn)</div>
+      <div id="transport-chart" style="display:flex;align-items:flex-end;gap:8px;height:120px;padding-bottom:24px;position:relative;">
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">Sources: LGA, County Councils Network. 2030-31 is CCN projection.</div>
+    </div>
+
+    <!-- LA drill-down teaser -->
+    <div style="margin:24px 0;padding:24px;background:linear-gradient(135deg,var(--accent-dim),rgba(0,212,212,0.04));border:1px solid var(--accent);border-radius:12px;text-align:center;">
+      <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px;">What's happening in your local authority?</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">SEND spending varies hugely by area. Some LAs spend 3x more per pupil than others. We've built a tool that lets you look up your LA, see the trend, and compare against similar authorities.</p>
+      <a href="https://schoolgle.co.uk" style="display:inline-block;padding:12px 28px;background:var(--accent);color:#070B18;font-weight:600;font-size:14px;border-radius:8px;text-decoration:none;min-height:44px;">Get free access to the SEND Explorer →</a>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;">Free for individual schools. Trust-wide benchmarking in Pro.</div>
+    </div>
+
     <div class="action-box">
       <strong>Do this next</strong>
-      <ul><li>Check what your LA spends on transport for your pupils vs. the provision itself. If transport exceeds provision, raise it at your next SEND review.</li></ul>
+      <ul>
+        <li>Check what your LA spends on transport for your pupils vs. the provision itself. If transport exceeds provision, raise it at your next SEND review.</li>
+        <li>Find your LA's high needs block allocation: <a href="https://explore-education-statistics.service.gov.uk/find-statistics/school-funding-statistics" target="_blank" rel="noopener">DfE School Funding Statistics</a></li>
+        <li>Read the LGA's full SEND transport analysis: <a href="https://www.local.gov.uk/parliament/briefings-and-responses/local-government-association-response-department-educations-send" target="_blank" rel="noopener">LGA SEND Reform Response</a></li>
+      </ul>
     </div>
   </div>
 
@@ -799,6 +828,121 @@ sSlider.addEventListener('input', () => { sVal.value = sSlider.value; calculate(
 sVal.addEventListener('input', () => { sSlider.value = Math.min(80000, Math.max(0, sVal.value)); calculate(); });
 
 calculate();
+
+// ===== SEND SPENDING CHART =====
+(function() {
+  const data = [
+    { year: '2015-16', value: 5.0, forecast: false },
+    { year: '2016-17', value: 7.5, forecast: false },
+    { year: '2017-18', value: 8.0, forecast: false },
+    { year: '2018-19', value: 8.5, forecast: false },
+    { year: '2019-20', value: 9.0, forecast: false },
+    { year: '2020-21', value: 9.5, forecast: false },
+    { year: '2021-22', value: 10.2, forecast: false },
+    { year: '2022-23', value: 10.7, forecast: false },
+    { year: '2023-24', value: 11.8, forecast: false },
+    { year: '2024-25', value: 12.0, forecast: false },
+    { year: '2028-29', value: 18.0, forecast: true },
+  ];
+  const maxVal = 20;
+  const chart = document.getElementById('send-chart');
+  if (!chart) return;
+
+  data.forEach((d, i) => {
+    const col = document.createElement('div');
+    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;';
+
+    const val = document.createElement('div');
+    val.style.cssText = 'font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px;';
+    val.textContent = '£' + d.value + 'bn';
+
+    const bar = document.createElement('div');
+    const pct = (d.value / maxVal) * 100;
+    bar.style.cssText = `width:100%;border-radius:6px 6px 0 0;background:${d.forecast ? 'var(--error-text)' : 'var(--accent)'};opacity:${d.forecast ? '0.6' : '1'};height:0;transition:height 0.6s ease ${i * 0.08}s;`;
+    bar.dataset.height = pct + '%';
+
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:9px;color:var(--muted);margin-top:6px;text-align:center;white-space:nowrap;';
+    label.textContent = d.year.replace('20','\'');
+    if (d.forecast) {
+      const tag = document.createElement('div');
+      tag.style.cssText = 'font-size:8px;color:var(--error-text);font-weight:600;';
+      tag.textContent = 'FORECAST';
+      label.appendChild(tag);
+    }
+
+    col.appendChild(val);
+    col.appendChild(bar);
+    col.appendChild(label);
+    chart.appendChild(col);
+  });
+
+  // Animate on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        chart.querySelectorAll('[data-height]').forEach(bar => {
+          bar.style.height = bar.dataset.height;
+        });
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  observer.observe(chart);
+
+  // Transport chart
+  const tData = [
+    { year: '2015-16', value: 0.644 },
+    { year: '2018-19', value: 0.95 },
+    { year: '2021-22', value: 1.3 },
+    { year: '2023-24', value: 1.7 },
+    { year: '2030-31', value: 3.4, forecast: true },
+  ];
+  const tMax = 4;
+  const tChart = document.getElementById('transport-chart');
+  if (!tChart) return;
+
+  tData.forEach((d, i) => {
+    const col = document.createElement('div');
+    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;';
+
+    const val = document.createElement('div');
+    val.style.cssText = 'font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;';
+    val.textContent = '£' + d.value.toFixed(1) + 'bn';
+
+    const bar = document.createElement('div');
+    const pct = (d.value / tMax) * 100;
+    bar.style.cssText = `width:100%;max-width:60px;border-radius:6px 6px 0 0;background:${d.forecast ? 'var(--error-text)' : '#FBBF24'};opacity:${d.forecast ? '0.6' : '1'};height:0;transition:height 0.6s ease ${i * 0.1}s;`;
+    bar.dataset.height = pct + '%';
+
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:10px;color:var(--muted);margin-top:6px;';
+    label.textContent = d.year;
+    if (d.forecast) {
+      const tag = document.createElement('span');
+      tag.style.cssText = 'display:block;font-size:8px;color:var(--error-text);font-weight:600;';
+      tag.textContent = 'FORECAST';
+      label.appendChild(tag);
+    }
+
+    col.appendChild(val);
+    col.appendChild(bar);
+    col.appendChild(label);
+    tChart.appendChild(col);
+  });
+
+  const tObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tChart.querySelectorAll('[data-height]').forEach(bar => {
+          bar.style.height = bar.dataset.height;
+        });
+        tObs.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  tObs.observe(tChart);
+})();
 </script>
 </body>
 </html>
