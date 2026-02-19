@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schoolgle Toolbox — Free Tools for Schools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0f172a; color: #cbd5e1; }
+  .container { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+  .header { text-align: center; margin-bottom: 48px; }
+  .header h1 { font-family: 'Outfit', sans-serif; font-size: 36px; color: #f8fafc; font-weight: 300; }
+  .header h1 span { color: #0ea5e9; font-weight: 700; }
+  .header p { color: #64748b; margin-top: 8px; font-size: 15px; }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .tool-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .tool-card:hover { border-color: #0ea5e9; transform: translateY(-2px); }
+  .tool-tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .tag-finance { background: rgba(16,185,129,0.15); color: #34d399; }
+  .tag-send { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .tag-operations { background: rgba(14,165,233,0.15); color: #38bdf8; }
+  .tag-safeguarding { background: rgba(239,68,68,0.15); color: #f87171; }
+  .tag-estates { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+  .tag-compliance { background: rgba(234,179,8,0.15); color: #facc15; }
+  .tool-card h3 { font-size: 17px; color: #f1f5f9; margin-bottom: 8px; }
+  .tool-card p { font-size: 13px; color: #94a3b8; line-height: 1.5; margin-bottom: 12px; }
+  .tool-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+  .time-saved { color: #34d399; font-weight: 600; }
+  .tool-cta { color: #0ea5e9; font-weight: 600; }
+  .cross-sell { margin-top: 48px; background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(0,186,167,0.08)); border: 1px solid rgba(14,165,233,0.15); border-radius: 16px; padding: 32px; text-align: center; }
+  .cross-sell h2 { font-family: 'Outfit', sans-serif; font-size: 22px; color: #f1f5f9; margin-bottom: 12px; }
+  .cross-sell p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+  .cross-sell a { display: inline-block; padding: 12px 28px; background: #0ea5e9; color: #fff; font-weight: 600; border-radius: 8px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Schoolgle <span>Toolbox</span></h1>
+    <p>Free tools for school leaders, SBMs, and site managers. No signup required.</p>
+  </div>
+
+  <div class="tools-grid">
+    <a href="ni-calculator.html" class="tool-card">
+      <span class="tool-tag tag-finance">Finance</span>
+      <h3>NI Cost Calculator</h3>
+      <p>Calculate the exact impact of the employer NI increase on your school budget. Enter staff count and average salary.</p>
+      <div class="tool-meta">
+        <span class="time-saved">⏱ Saves ~4 hours</span>
+        <span class="tool-cta">Use free →</span>
+      </div>
+    </a>
+
+    <a href="#" class="tool-card" style="opacity:0.6;">
+      <span class="tool-tag tag-operations">Operations</span>
+      <h3>Census Readiness Checker</h3>
+      <p>Tick-box audit of your Spring Census data. Flags missing UPNs, FSM errors, SEN mismatches, and attendance gaps.</p>
+      <div class="tool-meta">
+        <span class="time-saved">⏱ Saves ~3 hours</span>
+        <span class="tool-cta">Coming soon</span>
+      </div>
+    </a>
+
+    <a href="#" class="tool-card" style="opacity:0.6;">
+      <span class="tool-tag tag-send">SEND</span>
+      <h3>SEND Funding Calculator</h3>
+      <p>Enter your EHCP and SEN Support numbers. See if your funding matches the national average for your LA area.</p>
+      <div class="tool-meta">
+        <span class="time-saved">⏱ Saves ~5 hours</span>
+        <span class="tool-cta">Coming soon</span>
+      </div>
+    </a>
+
+    <a href="#" class="tool-card" style="opacity:0.6;">
+      <span class="tool-tag tag-estates">Estates</span>
+      <h3>Legionella Compliance Checker</h3>
+      <p>Quick audit against HSE guidance. Are your water hygiene checks up to date? Flags overdue actions.</p>
+      <div class="tool-meta">
+        <span class="time-saved">⏱ Saves ~2 hours</span>
+        <span class="tool-cta">Coming soon</span>
+      </div>
+    </a>
+
+    <a href="#" class="tool-card" style="opacity:0.6;">
+      <span class="tool-tag tag-safeguarding">Safeguarding</span>
+      <h3>AUP AI Policy Generator</h3>
+      <p>Generate an AI addendum for your Acceptable Use Policy. Covers ChatGPT, deepfakes, filtering requirements.</p>
+      <div class="tool-meta">
+        <span class="time-saved">⏱ Saves ~3 hours</span>
+        <span class="tool-cta">Coming soon</span>
+      </div>
+    </a>
+
+    <a href="#" class="tool-card" style="opacity:0.6;">
+      <span class="tool-tag tag-compliance">Compliance</span>
+      <h3>End-of-Term Checklist</h3>
+      <p>Interactive compliance checklist for the end of every term. Safeguarding, data, buildings, governance — nothing missed.</p>
+      <div class="tool-meta">
+        <span class="time-saved">⏱ Saves ~2 hours</span>
+        <span class="tool-cta">Coming soon</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="cross-sell">
+    <h2>These tools are a taste of what Schoolgle does.</h2>
+    <p>The full platform automates compliance, tracks deadlines, generates documents, and gives you one place to manage HR, Finance, SEND, Estates, and Safeguarding. Built by people who've actually worked in schools.</p>
+    <a href="https://schoolgle.co.uk">See the full platform →</a>
+  </div>
+</div>
+</body>
+</html>

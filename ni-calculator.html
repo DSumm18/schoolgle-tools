@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Schoolgle Signal — Week 6</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0f172a;
+    color: #cbd5e1;
+    line-height: 1.7;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 2px solid;
+    border-image: linear-gradient(90deg, #0ea5e9, #00baa7, #0ea5e9) 1;
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  .header h1 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: 32px;
+    color: #f8fafc;
+    letter-spacing: 1px;
+  }
+  .header h1 span { color: #0ea5e9; font-weight: 700; }
+  .header .subtitle {
+    font-size: 12px;
+    color: #64748b;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .header .date {
+    font-size: 13px;
+    color: #475569;
+    margin-top: 12px;
+  }
+
+  /* Module tags */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .tag-finance { background: rgba(16,185,129,0.15); color: #34d399; }
+  .tag-send { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .tag-operations { background: rgba(14,165,233,0.15); color: #38bdf8; }
+  .tag-compliance { background: rgba(234,179,8,0.15); color: #facc15; }
+  .tag-safeguarding { background: rgba(239,68,68,0.15); color: #f87171; }
+  .tag-ai { background: rgba(168,85,247,0.15); color: #c084fc; }
+
+  /* Content */
+  h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin: 48px 0 16px;
+    line-height: 1.3;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin: 32px 0 12px;
+  }
+  p { margin-bottom: 16px; }
+  strong { color: #e2e8f0; }
+
+  ul, ol {
+    margin: 12px 0 16px 24px;
+  }
+  li { margin-bottom: 8px; }
+
+  hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #334155, transparent);
+    margin: 40px 0;
+  }
+
+  a { color: #0ea5e9; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  blockquote {
+    border-left: 3px solid #0ea5e9;
+    padding: 12px 20px;
+    margin: 20px 0;
+    background: rgba(14,165,233,0.05);
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Calculator widget */
+  .calculator {
+    background: linear-gradient(135deg, #1e293b 0%, #1a2332 100%);
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 32px;
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .calculator::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0ea5e9, #00baa7);
+  }
+  .calc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .calc-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+  .calc-badge {
+    background: rgba(14,165,233,0.15);
+    color: #0ea5e9;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .input-row input[type="range"] {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    background: #334155;
+    border-radius: 3px;
+    outline: none;
+  }
+  .input-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #0ea5e9;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(14,165,233,0.4);
+  }
+  .input-row .value-display {
+    min-width: 80px;
+    padding: 8px 12px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #f1f5f9;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    font-family: 'Inter', monospace;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .result-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .result-label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .result-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #f1f5f9;
+    font-family: 'Inter', monospace;
+  }
+  .result-card.highlight {
+    border-color: #ef4444;
+    background: rgba(239,68,68,0.08);
+  }
+  .result-card.highlight .result-value {
+    color: #ef4444;
+  }
+
+  .benchmark {
+    background: rgba(14,165,233,0.06);
+    border: 1px solid rgba(14,165,233,0.15);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+  .benchmark-title {
+    font-size: 11px;
+    color: #0ea5e9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .benchmark-bars { display: flex; flex-direction: column; gap: 8px; }
+  .bench-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .bench-label { width: 100px; color: #94a3b8; font-size: 12px; }
+  .bench-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: #1e293b;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bench-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .bench-value { width: 70px; text-align: right; color: #94a3b8; font-size: 12px; font-family: monospace; }
+
+  .time-saved {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #34d399;
+    font-weight: 600;
+  }
+
+  /* Caveat */
+  .caveat {
+    font-size: 11px;
+    color: #475569;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  /* CTA */
+  .cta {
+    background: linear-gradient(135deg, rgba(14,165,233,0.1), rgba(0,186,167,0.1));
+    border: 1px solid rgba(14,165,233,0.2);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    margin-top: 48px;
+  }
+  .cta h2 { margin-top: 0; }
+  .cta-button {
+    display: inline-block;
+    padding: 14px 32px;
+    background: #0ea5e9;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 8px;
+    margin-top: 16px;
+    transition: background 0.2s;
+  }
+  .cta-button:hover { background: #0284c7; text-decoration: none; }
+
+  /* Footer */
+  .footer {
+    font-size: 12px;
+    color: #475569;
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #1e293b;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Schoolgle <span>Signal</span></h1>
+    <div class="subtitle">Intelligence for school leaders</div>
+    <div class="date">Week of 27 January 2026</div>
+  </div>
+
+  <!-- What's Due -->
+  <h2>What's due this week</h2>
+  <p><strong>31 January</strong> — Spring Census day. If your data isn't clean by now, you're firefighting. Check UPNs, FSM claims, attendance marks, and SEN codes one more time.</p>
+  <p><strong>Ongoing</strong> — Admission appeals training for panel members should be arranged before the spring round starts.</p>
+
+  <hr>
+
+  <!-- NI Section -->
+  <span class="tag tag-finance">Finance</span>
+  <h2>The National Insurance rise is real. Here's what it costs your school.</h2>
+
+  <p>The employer NI increase from April has been confirmed. Most schools haven't properly costed it yet. The DfE says additional funding will cover it. Spoiler: it won't cover all of it, and the gap falls on your budget.</p>
+
+  <p>The increase takes employer NI contributions from 13.8% to 15%. That's a 1.2 percentage point rise. On a school with 80 staff averaging £28,000, that's roughly an extra £26,880 a year. On a large secondary with 150 staff, you're looking at over £50,000.</p>
+
+  <p>The government allocated £740 million to public sector employers to offset the rise. But that's spread across the entire public sector — NHS, councils, police, and schools. The per-school amount won't match the actual cost for most.</p>
+
+  <h3>What does it actually cost your school?</h3>
+  <p>Rather than guessing, put your numbers in:</p>
+
+  <!-- CALCULATOR -->
+  <div class="calculator" id="ni-calc">
+    <div class="calc-header">
+      <div class="calc-title">NI Cost Calculator</div>
+      <div class="calc-badge">INTERACTIVE TOOL</div>
+    </div>
+
+    <div class="input-group">
+      <label>Number of staff (headcount)</label>
+      <div class="input-row">
+        <input type="range" id="staffSlider" min="10" max="250" value="80">
+        <div class="value-display" id="staffDisplay">80</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Average salary (blended across all staff)</label>
+      <div class="input-row">
+        <input type="range" id="salarySlider" min="18000" max="55000" step="500" value="28000">
+        <div class="value-display" id="salaryDisplay">£28,000</div>
+      </div>
+    </div>
+
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="result-label">Total payroll</div>
+        <div class="result-value" id="totalPayroll">£2,240,000</div>
+      </div>
+      <div class="result-card">
+        <div class="result-label">Current NI (13.8%)</div>
+        <div class="result-value" id="currentNI">£309,120</div>
+      </div>
+      <div class="result-card">
+        <div class="result-label">New NI (15%)</div>
+        <div class="result-value" id="newNI">£336,000</div>
+      </div>
+      <div class="result-card highlight">
+        <div class="result-label">Additional cost per year</div>
+        <div class="result-value" id="additionalCost">£26,880</div>
+      </div>
+    </div>
+
+    <div class="benchmark">
+      <div class="benchmark-title">How your school compares</div>
+      <div class="benchmark-bars">
+        <div class="bench-row">
+          <span class="bench-label">Small (30 staff)</span>
+          <div class="bench-bar-bg"><div class="bench-bar" id="barSmall" style="width:20%;background:#0ea5e9;"></div></div>
+          <span class="bench-value">£10,080</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Medium (80 staff)</span>
+          <div class="bench-bar-bg"><div class="bench-bar" id="barMedium" style="width:50%;background:#0ea5e9;"></div></div>
+          <span class="bench-value">£26,880</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label">Large (150 staff)</span>
+          <div class="bench-bar-bg"><div class="bench-bar" id="barLarge" style="width:80%;background:#0ea5e9;"></div></div>
+          <span class="bench-value">£50,400</span>
+        </div>
+        <div class="bench-row">
+          <span class="bench-label" style="color:#f1f5f9;font-weight:600;">Your school</span>
+          <div class="bench-bar-bg"><div class="bench-bar" id="barYou" style="width:50%;background:#ef4444;"></div></div>
+          <span class="bench-value" id="barYouValue" style="color:#ef4444;font-weight:600;">£26,880</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="time-saved">
+      ⏱️ Time saved using this calculator: ~4 hours of spreadsheet work
+    </div>
+
+    <div class="caveat">
+      Note: Uses standard employer NI rates above the secondary threshold. Your actual increase depends on pay bands, pension contributions, and contracted hours. Use this for planning — verify with your payroll provider.
+    </div>
+  </div>
+
+  <h3>What to do with this number</h3>
+  <ul>
+    <li>Put it in your budget forecast for next year. If you haven't already, you're behind.</li>
+    <li>Check what your trust or LA is passing through from the government allocation. Ask the question directly.</li>
+    <li>If the gap between the allocation and the actual cost is more than 1% of your budget, flag it to governors now.</li>
+    <li>Look at your staffing structure. This is another pressure on the case for not replacing leavers one-for-one.</li>
+  </ul>
+
+  <hr>
+
+  <!-- Census -->
+  <span class="tag tag-operations">Operations</span>
+  <h2>Census validation errors: the ones people always miss</h2>
+
+  <p>Spring Census is Thursday. If you've been through this before, you know the drill. If you haven't, here are the validation errors that catch people out every year:</p>
+
+  <ul>
+    <li><strong>Duplicate UPNs</strong> — especially for pupils who transferred in mid-year. Check your MIS didn't create a new record instead of merging.</li>
+    <li><strong>FSM eligibility flags</strong> — a pupil can be FSM-eligible even if they don't take a free meal. Make sure the eligibility flag is set, not just the meal uptake.</li>
+    <li><strong>SEN provision mismatch</strong> — pupils coded as SEN Support but with no provision mapped. Or EHCP pupils without a named provision type.</li>
+    <li><strong>Attendance marks after leaving date</strong> — if a pupil left mid-term, check there are no attendance marks after their leaving date.</li>
+    <li><strong>Missing ethnicity data</strong> — you can't force parents to provide it, but blank fields trigger validation warnings. Code as "refused" rather than leaving blank.</li>
+  </ul>
+
+  <p>Every error you fix before submission is one less query to deal with in February. Worth spending an hour on it today.</p>
+
+  <hr>
+
+  <!-- Strike -->
+  <span class="tag tag-compliance">Compliance</span>
+  <h2>NEU on directed time: what's actually being said</h2>
+
+  <p>The NEU has been vocal this month about directed time. The union's position is that too many schools are using directed time for tasks that should be discretionary — specifically, data entry, display work, and certain meeting structures.</p>
+
+  <p>The legal position hasn't changed. Teachers can be directed for 1,265 hours per year. What counts as directed time is determined by the headteacher. The union's argument is about custom and practice, not law.</p>
+
+  <p>If you're a head reading this: check your directed time budget. Not because the NEU says so, but because it's good practice. If your teachers are consistently working beyond directed time to complete essential tasks, you have a workload problem, not a union problem.</p>
+
+  <hr>
+
+  <!-- The Question -->
+  <h2>The honest question</h2>
+
+  <p>The NI increase will cost most schools between £15,000 and £60,000. The government says additional funding will offset it. But the funding comes through existing grant mechanisms, not as a separate line item, and the total pot is shared across every public sector employer.</p>
+
+  <p><strong>Has your school actually calculated the gap between the NI increase and the funding you'll receive? And if so, what are you cutting to fill it?</strong></p>
+
+  <p>We'd genuinely like to hear from SBMs and heads on this. The honest answers are usually more useful than the official guidance.</p>
+
+  <hr>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>The White Paper is coming.</h2>
+    <p>When it drops, we'll publish a practical breakdown within 48 hours. What changes. What doesn't. What the funding actually covers.</p>
+    <a href="https://schoolgle.co.uk" class="cta-button">Sign up — it's free</a>
+  </div>
+
+  <div class="footer">
+    <p>The Schoolgle Signal — actual news for school leaders, with the practical context to act on it.</p>
+    <p style="margin-top:8px;">© 2026 Schoolgle · <a href="https://schoolgle.co.uk">schoolgle.co.uk</a></p>
+  </div>
+
+</div>
+
+<script>
+const staffSlider = document.getElementById('staffSlider');
+const salarySlider = document.getElementById('salarySlider');
+const staffDisplay = document.getElementById('staffDisplay');
+const salaryDisplay = document.getElementById('salaryDisplay');
+
+function formatGBP(n) {
+  return '£' + n.toLocaleString('en-GB');
+}
+
+function calculate() {
+  const staff = parseInt(staffSlider.value);
+  const salary = parseInt(salarySlider.value);
+  const payroll = staff * salary;
+
+  // NI: 13.8% -> 15% (1.2pp increase)
+  const currentRate = 0.138;
+  const newRate = 0.15;
+
+  const currentNI = payroll * currentRate;
+  const newNI = payroll * newRate;
+  const additional = newNI - currentNI;
+
+  staffDisplay.textContent = staff;
+  salaryDisplay.textContent = formatGBP(salary);
+  document.getElementById('totalPayroll').textContent = formatGBP(Math.round(payroll));
+  document.getElementById('currentNI').textContent = formatGBP(Math.round(currentNI));
+  document.getElementById('newNI').textContent = formatGBP(Math.round(newNI));
+  document.getElementById('additionalCost').textContent = formatGBP(Math.round(additional));
+
+  // Benchmarks (fixed)
+  const smallCost = 30 * 28000 * 0.012;
+  const medCost = 80 * 28000 * 0.012;
+  const largeCost = 150 * 28000 * 0.012;
+  const maxCost = 250 * 55000 * 0.012; // max possible
+
+  document.getElementById('barSmall').style.width = (smallCost / maxCost * 100) + '%';
+  document.getElementById('barMedium').style.width = (medCost / maxCost * 100) + '%';
+  document.getElementById('barLarge').style.width = (largeCost / maxCost * 100) + '%';
+  document.getElementById('barYou').style.width = (additional / maxCost * 100) + '%';
+  document.getElementById('barYouValue').textContent = formatGBP(Math.round(additional));
+}
+
+staffSlider.addEventListener('input', calculate);
+salarySlider.addEventListener('input', calculate);
+
+calculate();
+</script>
+</body>
+</html>
