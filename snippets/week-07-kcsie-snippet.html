@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 7: KCSIE 2026 Quick Check</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#070B12;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#E6EDF3;--dim:#8B949E;--cyan:#00D4D4;--green:#22C55E;--red:#EF4444;--amber:#F59E0B}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);padding:20px;line-height:1.6}
+.snippet{max-width:560px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;backdrop-filter:blur(12px)}
+.brand{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--cyan);margin-bottom:12px}
+h1{font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.sub{font-size:13px;color:var(--dim);margin-bottom:20px}
+.q{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;gap:8px}
+.q:last-of-type{border-bottom:none}
+.q-text{flex:1}
+.q-btns{display:flex;gap:4px;flex-shrink:0}
+.q-btn{width:36px;height:30px;border:1px solid var(--border);background:transparent;color:var(--dim);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s}
+.q-btn.yes.active{background:var(--green);color:#000;border-color:var(--green)}
+.q-btn.no.active{background:var(--red);color:#fff;border-color:var(--red)}
+.result{text-align:center;padding:16px 0;display:none}
+.result.show{display:block}
+.result-score{font-size:2rem;font-weight:800;margin-bottom:4px}
+.result-text{font-size:13px;color:var(--dim)}
+.teaser{font-size:12px;color:var(--dim);text-align:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.cta{display:block;text-align:center;margin-top:14px;padding:12px;background:var(--cyan);color:var(--bg);text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;transition:opacity .2s}
+.cta:hover{opacity:.85}
+.attr{text-align:center;font-size:10px;color:var(--dim);margin-top:14px}
+</style>
+</head>
+<body>
+<div class="snippet">
+  <div class="brand">Schoolgle | The Staff Room</div>
+  <h1>KCSIE 2026: Are you ready for the changes?</h1>
+  <p class="sub">Answer 5 quick questions to find out where you stand.</p>
+
+  <div class="q" data-q="0"><span class="q-text">Is your child protection policy updated for KCSIE 2025 and anticipated 2026 changes?</span><div class="q-btns"><button class="q-btn yes" onclick="answer(0,true,this)">Y</button><button class="q-btn no" onclick="answer(0,false,this)">N</button></div></div>
+  <div class="q" data-q="1"><span class="q-text">Have all staff read KCSIE Part 1 and signed to confirm?</span><div class="q-btns"><button class="q-btn yes" onclick="answer(1,true,this)">Y</button><button class="q-btn no" onclick="answer(1,false,this)">N</button></div></div>
+  <div class="q" data-q="2"><span class="q-text">Does your filtering and monitoring meet DfE standards?</span><div class="q-btns"><button class="q-btn yes" onclick="answer(2,true,this)">Y</button><button class="q-btn no" onclick="answer(2,false,this)">N</button></div></div>
+  <div class="q" data-q="3"><span class="q-text">Are safeguarding concerns logged on a central recording system?</span><div class="q-btns"><button class="q-btn yes" onclick="answer(3,true,this)">Y</button><button class="q-btn no" onclick="answer(3,false,this)">N</button></div></div>
+  <div class="q" data-q="4"><span class="q-text">Has the Single Central Record been audited this term?</span><div class="q-btns"><button class="q-btn yes" onclick="answer(4,true,this)">Y</button><button class="q-btn no" onclick="answer(4,false,this)">N</button></div></div>
+
+  <div class="result" id="result">
+    <div class="result-score" id="rScore"></div>
+    <div class="result-text" id="rText"></div>
+  </div>
+
+  <div class="teaser">Full 25-point audit with action plan, risk levels, and governor report available in the complete tool.</div>
+  <a class="cta" href="kcsie-checker.html">Run the Full KCSIE Audit &rarr;</a>
+  <div class="attr">Based on DfE Keeping Children Safe in Education 2025 (with anticipated 2026 changes).</div>
+</div>
+
+<script>
+const answers = [null,null,null,null,null];
+function answer(i,val,btn){
+  answers[i]=val;
+  const row=btn.closest('.q-btns');
+  row.querySelectorAll('.q-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(answers.every(a=>a!==null)){
+    const score=answers.filter(Boolean).length;
+    const el=document.getElementById('result');
+    el.classList.add('show');
+    const col=score<=2?'var(--red)':score<=3?'var(--amber)':score<=4?'var(--green)':'var(--cyan)';
+    document.getElementById('rScore').textContent=score+'/5';
+    document.getElementById('rScore').style.color=col;
+    const texts=[
+      'Significant gaps identified. You need the full audit urgently.',
+      'Significant gaps identified. You need the full audit urgently.',
+      'Some gaps identified. The full audit will pinpoint exactly where.',
+      'Some gaps. A few areas need attention before your next inspection.',
+      'Looking good! Run the full 25-point audit to confirm.',
+      'Excellent position. Use the full audit to evidence for governors.'
+    ];
+    document.getElementById('rText').textContent='You answered '+score+'/5 \u2014 '+texts[score];
+  }
+}
+</script>
+</body>
+</html>

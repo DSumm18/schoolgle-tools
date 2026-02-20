@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCSIE 2026 Compliance Checker | Schoolgle</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#070B12;--surface:rgba(255,255,255,0.04);--surface-hover:rgba(255,255,255,0.07);--border:rgba(255,255,255,0.08);--text:#E6EDF3;--text-dim:#8B949E;--cyan:#00D4D4;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;--yellow:#EAB308;--purple:#A78BFA}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:16px}
+header{text-align:center;padding:24px 0 16px}
+.brand{font-size:12px;text-transform:uppercase;letter-spacing:3px;color:var(--cyan);margin-bottom:4px}
+h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:700;margin-bottom:8px}
+.subtitle{color:var(--text-dim);font-size:14px}
+
+/* Progress bar */
+.progress-wrap{position:sticky;top:0;z-index:100;background:var(--bg);padding:12px 0 8px;border-bottom:1px solid var(--border)}
+.progress-bar-outer{height:8px;background:var(--surface);border-radius:4px;overflow:hidden}
+.progress-bar-inner{height:100%;border-radius:4px;transition:width .4s ease,background .4s ease;width:0}
+.progress-label{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px}
+.score-big{font-size:clamp(2rem,6vw,3rem);font-weight:800;text-align:center;margin:8px 0}
+.interpretation{text-align:center;font-size:15px;padding:8px 16px;border-radius:8px;background:var(--surface);margin-bottom:16px}
+
+/* Cards */
+.card{background:var(--surface);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;transition:background .2s}
+.card:hover{background:var(--surface-hover)}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none;gap:8px}
+.card-header h2{font-size:15px;font-weight:600;flex:1}
+.badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap}
+.badge-policies{background:rgba(167,139,250,.15);color:var(--purple)}
+.badge-training{background:rgba(0,212,212,.15);color:var(--cyan)}
+.badge-online{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-reporting{background:rgba(245,158,11,.15);color:var(--amber)}
+.badge-governance{background:rgba(34,197,94,.15);color:var(--green)}
+.cat-score{font-size:12px;color:var(--text-dim);margin-right:8px}
+.chevron{transition:transform .3s;color:var(--text-dim);font-size:18px}
+.chevron.open{transform:rotate(180deg)}
+.card-body{display:none;padding:0 16px 14px}
+.card-body.open{display:block}
+
+/* Checklist items */
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.check-item:last-child{border-bottom:none}
+.check-item input[type=checkbox]{width:20px;height:20px;margin-top:2px;accent-color:var(--cyan);flex-shrink:0;cursor:pointer}
+.check-label{flex:1}
+.check-title{font-size:14px;font-weight:500}
+.check-desc{font-size:12px;color:var(--text-dim);margin-top:2px}
+.risk-tag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.risk-critical{background:rgba(239,68,68,.2);color:var(--red)}
+.risk-high{background:rgba(245,158,11,.2);color:var(--amber)}
+.risk-medium{background:rgba(234,179,8,.2);color:var(--yellow)}
+
+/* Category chart */
+.chart-section{margin:20px 0}
+.bar-chart .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{width:110px;font-size:12px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:24px;background:var(--surface);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.bar-val{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:600}
+
+/* Ofsted readiness */
+.ofsted-box{padding:16px;border-radius:12px;background:var(--surface);border:1px solid var(--border);margin:16px 0}
+.ofsted-box h3{font-size:14px;margin-bottom:8px;color:var(--cyan)}
+
+/* Action plan */
+.action-plan{margin:16px 0}
+.action-item{padding:12px;background:var(--surface);border-radius:8px;margin-bottom:8px;border-left:3px solid var(--amber)}
+.action-item.critical{border-left-color:var(--red)}
+.action-item.medium{border-left-color:var(--yellow)}
+.action-item h4{font-size:13px;margin-bottom:4px}
+.action-item p{font-size:12px;color:var(--text-dim)}
+.action-deadline{font-size:11px;color:var(--cyan);margin-top:4px}
+
+/* Key dates */
+.dates-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px}
+.date-card{padding:10px;background:var(--surface);border-radius:8px;font-size:12px}
+.date-card strong{color:var(--cyan);display:block;margin-bottom:2px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--cyan);color:var(--bg)}
+.btn-primary:hover{opacity:.85}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--surface)}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+
+/* Attribution */
+.attribution{text-align:center;font-size:11px;color:var(--text-dim);padding:24px 0 16px;border-top:1px solid var(--border);margin-top:24px}
+
+/* Print */
+@media print{
+  body{background:#fff;color:#000}
+  .progress-wrap,.btn-row,.no-print{display:none!important}
+  .card{break-inside:avoid;border:1px solid #ccc;background:#fff}
+  .card-body{display:block!important}
+  .action-item{border-left-width:4px;background:#f9f9f9}
+  .attribution{color:#666}
+}
+@media(max-width:480px){
+  .container{padding:10px}
+  .bar-label{width:80px;font-size:11px}
+  .dates-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div class="brand">Schoolgle | The Staff Room</div>
+  <h1>KCSIE 2026 Compliance Checker</h1>
+  <p class="subtitle">Audit your school's safeguarding compliance against Keeping Children Safe in Education 2026</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar"></div></div>
+  <div class="progress-label"><span id="progressText">0 of 25 complete</span><span id="progressPct">0%</span></div>
+</div>
+
+<div class="score-big" id="scoreBig">0%</div>
+<div class="interpretation" id="interpretation">Complete the checklist below to assess your compliance position.</div>
+
+<div id="categories"></div>
+
+<div class="chart-section">
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h2>Category Breakdown</h2>
+      <span class="chevron">&#9662;</span>
+    </div>
+    <div class="card-body" id="chartBody">
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h2>Ofsted Readiness Indicator</h2>
+    <span class="chevron">&#9662;</span>
+  </div>
+  <div class="card-body" id="ofstedBody">
+    <div class="ofsted-box" id="ofstedBox"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h2>Action Plan</h2>
+    <span class="chevron">&#9662;</span>
+  </div>
+  <div class="card-body" id="actionBody">
+    <div class="action-plan" id="actionPlan"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h2>Key Dates &amp; Deadlines</h2>
+    <span class="chevron">&#9662;</span>
+  </div>
+  <div class="card-body">
+    <div class="dates-grid">
+      <div class="date-card"><strong>Sept 2025</strong>KCSIE 2025 statutory guidance in force</div>
+      <div class="date-card"><strong>Spring 2026</strong>Anticipated KCSIE 2026 consultation draft</div>
+      <div class="date-card"><strong>Sept 2026</strong>Expected KCSIE 2026 in force</div>
+      <div class="date-card"><strong>Termly</strong>Safeguarding training refresher for all staff</div>
+      <div class="date-card"><strong>Annually</strong>Full DSL update training (minimum)</div>
+      <div class="date-card"><strong>Before each term</strong>Filtering &amp; monitoring systems review</div>
+    </div>
+  </div>
+</div>
+
+<div class="btn-row no-print">
+  <button class="btn btn-primary" onclick="window.print()">Print Action Plan (PDF)</button>
+  <button class="btn btn-outline" onclick="resetAll()">Reset All</button>
+</div>
+
+<div class="attribution">
+  Based on DfE Keeping Children Safe in Education 2025 (with anticipated 2026 changes).<br>
+  Always verify against the latest published guidance.
+</div>
+</div>
+
+<script>
+const DATA = [
+  { name:'Policies & Procedures', badge:'policies', items:[
+    {t:'Child protection policy updated for KCSIE 2025/26',d:'Includes references to online safety, AI-generated content, low-level concerns, and domestic abuse as ACE.',risk:'high',action:'Review and update child protection policy with DSL. Cross-reference against KCSIE 2025 Part 1 and Annex B.',deadline:'Within 2 weeks'},
+    {t:'Allegations management procedures in place',d:'Clear process for managing allegations against staff including supply staff and volunteers, referral to LADO.',risk:'critical',action:'Audit allegations procedure. Ensure it covers supply staff, volunteers, and contractors. Confirm LADO contact details are current.',deadline:'Immediate'},
+    {t:'Low-level concerns policy documented and implemented',d:'Written policy for recording, reviewing, and acting on low-level concerns about staff conduct.',risk:'critical',action:'Create or update low-level concerns policy. Establish a recording system and assign responsibility for review.',deadline:'Within 1 week'},
+    {t:'Part-time timetable policy and recording process',d:'Formal policy for use of part-time timetables with recording, monitoring, and regular review.',risk:'high',action:'Draft part-time timetable policy. Create a register to track all pupils on reduced timetables with review dates.',deadline:'Within 4 weeks'},
+    {t:'Sexual violence and harassment response procedures',d:'Updated procedures reflecting KCSIE guidance on peer-on-peer abuse, including initial response and risk assessment.',risk:'critical',action:'Review response procedures against KCSIE Part 5. Train DSL team on initial response protocol.',deadline:'Within 2 weeks'}
+  ]},
+  { name:'Staff Training & Awareness', badge:'training', items:[
+    {t:'All staff read KCSIE Part 1 (or Annex A)',d:'Evidence that every member of staff has read and understood Part 1 of KCSIE (or Annex A condensed version).',risk:'critical',action:'Distribute KCSIE 2025 Part 1 to all staff. Collect signed declarations of reading and understanding.',deadline:'Immediate'},
+    {t:'DSL and deputies trained to Level 3 (updated within 2 years)',d:'Designated Safeguarding Lead and deputies have up-to-date multi-agency training.',risk:'critical',action:'Check DSL training dates. Book refresher training if certification is older than 2 years.',deadline:'Within 2 weeks'},
+    {t:'Staff trained on AI and deepfake risks',d:'Awareness training covering AI-generated imagery, deepfakes, and their safeguarding implications for children.',risk:'high',action:'Deliver staff briefing on AI/deepfake risks. Include in next safeguarding update and induction pack.',deadline:'Within half-term'},
+    {t:'Induction includes safeguarding for all new staff and volunteers',d:'Safeguarding induction covers child protection policy, behaviour policy, online safety, role of DSL, and reporting process.',risk:'high',action:'Review induction checklist. Ensure it covers all KCSIE requirements including online safety and whistleblowing.',deadline:'Within 4 weeks'},
+    {t:'Mental health awareness training for staff',d:'Whole school approach to mental health. Staff know how to identify and support pupils experiencing mental health difficulties.',risk:'medium',action:'Arrange mental health awareness training. Consider Senior Mental Health Lead training via DfE grant.',deadline:'Within half-term'}
+  ]},
+  { name:'Online Safety & Filtering', badge:'online', items:[
+    {t:'Filtering system meets DfE standards',d:'Internet filtering meets the DfE filtering standards (2023+). System blocks harmful content including CSAM, terrorist, and self-harm material.',risk:'critical',action:'Commission independent review of filtering against DfE standards. Document findings and remediation.',deadline:'Immediate'},
+    {t:'Monitoring system in place and reviewed',d:'Active monitoring of pupil and staff device activity with appropriate alerts to DSL.',risk:'critical',action:'Verify monitoring software is active on all devices. Ensure alerts route to DSL/IT lead. Test the system.',deadline:'Within 1 week'},
+    {t:'Annual filtering and monitoring review conducted',d:'Governing body has reviewed the effectiveness of filtering and monitoring at least annually.',risk:'high',action:'Schedule annual review with governors. Document outcomes and any changes made.',deadline:'Within half-term'},
+    {t:'Online safety integrated into curriculum',d:'Age-appropriate online safety education covering AI risks, sharing of images, healthy relationships online.',risk:'medium',action:'Audit PSHE/computing curriculum for online safety coverage. Address gaps, particularly around AI content.',deadline:'Within half-term'},
+    {t:'Staff acceptable use policy covers AI tools',d:'AUP updated to include guidance on use of generative AI tools by staff and pupils.',risk:'high',action:'Update AUP to address AI tools (ChatGPT, image generators, etc). Communicate to all staff and obtain signatures.',deadline:'Within 4 weeks'}
+  ]},
+  { name:'Reporting & Recording', badge:'reporting', items:[
+    {t:'Safeguarding concerns recorded on central system',d:'All concerns logged with dates, actions, and outcomes. System allows pattern identification across pupils.',risk:'critical',action:'Ensure recording system (e.g. CPOMS/MyConcern) is in use and all staff know how to log concerns.',deadline:'Immediate'},
+    {t:'Low-level concerns log maintained and reviewed',d:'Separate or integrated log for low-level staff conduct concerns, reviewed regularly by DSL/headteacher.',risk:'high',action:'Set up low-level concerns log if not in place. Schedule termly review with headteacher.',deadline:'Within 2 weeks'},
+    {t:'Children missing education tracked and reported',d:'Systems for tracking attendance, following up absences, and reporting CME to the local authority.',risk:'critical',action:'Review CME procedures. Ensure off-rolling risk is monitored and LA notifications are timely.',deadline:'Within 2 weeks'},
+    {t:'Multi-agency information sharing protocols followed',d:'School engages with local safeguarding partners, shares information appropriately, attends relevant meetings.',risk:'high',action:'Review information sharing agreements. Ensure DSL knows local thresholds and referral pathways.',deadline:'Within 4 weeks'},
+    {t:'Domestic abuse recognised and recorded as ACE',d:'Staff trained to recognise indicators of domestic abuse. Recording captures impact on children as adverse childhood experience.',risk:'medium',action:'Include domestic abuse as ACE in safeguarding training. Update concern forms to capture this context.',deadline:'Within half-term'}
+  ]},
+  { name:'Governance & Oversight', badge:'governance', items:[
+    {t:'Single Central Record complete and audited',d:'SCR includes all required checks for staff, supply staff, volunteers, and governors. Audited at least termly.',risk:'critical',action:'Audit SCR immediately. Ensure supply staff and volunteer columns are complete. Schedule termly audit.',deadline:'Immediate'},
+    {t:'Safeguarding governor identified and active',d:'Named safeguarding governor conducts regular visits, reviews reports, and provides challenge.',risk:'high',action:'Confirm safeguarding governor role. Schedule termly safeguarding visits and report to full board.',deadline:'Within 4 weeks'},
+    {t:'Governors receive termly safeguarding report',d:'DSL provides written report to governors covering concerns data, training, policy updates, and emerging issues.',risk:'high',action:'Establish termly reporting template. Include data on concerns, referrals, training, and KCSIE compliance.',deadline:'Within half-term'},
+    {t:'Section 175 (or 157) safeguarding audit completed',d:'Annual safeguarding self-assessment returned to local authority / safeguarding partnership.',risk:'medium',action:'Complete S175/157 audit if due. Use findings to update safeguarding action plan.',deadline:'By LA deadline'},
+    {t:'Enhanced DBS and barred list checks for all relevant staff',d:'All staff in regulated activity have enhanced DBS with barred list check. Supply staff verified on arrival.',risk:'critical',action:'Audit DBS status of all staff on SCR. Implement supply staff verification protocol for day-one checks.',deadline:'Immediate'}
+  ]}
+];
+
+const STORAGE_KEY = 'kcsie-checker-v1';
+
+function loadState(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }catch(e){ return {}; }
+}
+function saveState(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+let state = loadState();
+
+function toggleCard(el){
+  const body = el.nextElementSibling;
+  const chev = el.querySelector('.chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function render(){
+  const wrap = document.getElementById('categories');
+  wrap.innerHTML = '';
+  let total=0, checked=0;
+
+  DATA.forEach((cat,ci) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    let catChecked = 0;
+    let itemsHtml = '';
+    cat.items.forEach((item,ii) => {
+      total++;
+      const key = ci+'-'+ii;
+      const isChecked = state[key] || false;
+      if(isChecked){ checked++; catChecked++; }
+      const riskClass = item.risk==='critical'?'risk-critical':item.risk==='high'?'risk-high':'risk-medium';
+      const riskLabel = item.risk.charAt(0).toUpperCase()+item.risk.slice(1);
+      itemsHtml += '<div class="check-item"><input type="checkbox" id="c'+key+'" '+(isChecked?'checked':'')+' onchange="toggle(\''+key+'\')"><label class="check-label" for="c'+key+'"><span class="check-title">'+item.t+'<span class="risk-tag '+riskClass+'">'+riskLabel+'</span></span><div class="check-desc">'+item.d+'</div></label></div>';
+    });
+    const pct = Math.round(catChecked/cat.items.length*100);
+    card.innerHTML = '<div class="card-header" onclick="toggleCard(this)"><span class="badge badge-'+cat.badge+'">'+cat.name+'</span><span class="cat-score">'+pct+'%</span><h2></h2><span class="chevron">&#9662;</span></div><div class="card-body'+(ci===0?' open':'')+'">'+itemsHtml+'</div>';
+    if(ci===0) card.querySelector('.chevron').classList.add('open');
+    wrap.appendChild(card);
+  });
+
+  const pct = total?Math.round(checked/total*100):0;
+  const bar = document.getElementById('progressBar');
+  bar.style.width = pct+'%';
+  bar.style.background = pct<=40?'var(--red)':pct<=70?'var(--amber)':pct<=90?'var(--green)':'var(--cyan)';
+  document.getElementById('progressText').textContent = checked+' of '+total+' complete';
+  document.getElementById('progressPct').textContent = pct+'%';
+  document.getElementById('scoreBig').textContent = pct+'%';
+  document.getElementById('scoreBig').style.color = pct<=40?'var(--red)':pct<=70?'var(--amber)':pct<=90?'var(--green)':'var(--cyan)';
+
+  const interp = pct<=40?'Significant compliance gaps. Immediate action needed before next inspection.'
+    :pct<=70?'Partial compliance. Several areas need attention within the next half-term.'
+    :pct<=90?'Good progress. A few refinements needed to be fully compliant.'
+    :'Strong compliance position. Maintain and evidence for inspection.';
+  const emoji = pct<=40?'\uD83D\uDD34':pct<=70?'\uD83D\uDFE1':pct<=90?'\uD83D\uDFE2':'\u2705';
+  document.getElementById('interpretation').textContent = emoji+' '+interp;
+
+  renderChart();
+  renderOfsted(pct,checked,total);
+  renderActions();
+}
+
+function renderChart(){
+  const el = document.getElementById('barChart');
+  let html = '';
+  DATA.forEach((cat,ci) => {
+    let c=0;
+    cat.items.forEach((_,ii)=>{ if(state[ci+'-'+ii]) c++; });
+    const p = Math.round(c/cat.items.length*100);
+    const col = p<=40?'var(--red)':p<=70?'var(--amber)':p<=90?'var(--green)':'var(--cyan)';
+    html += '<div class="bar-row"><span class="bar-label">'+cat.name+'</span><div class="bar-track"><div class="bar-fill" style="width:'+p+'%;background:'+col+'"></div><span class="bar-val">'+p+'%</span></div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function renderOfsted(pct){
+  const box = document.getElementById('ofstedBox');
+  let html = '<h3>Ofsted Readiness</h3>';
+  if(pct<=40){
+    html += '<p>Based on your responses, an inspector would likely identify <strong>significant weaknesses in safeguarding</strong>. The school may be judged as having ineffective safeguarding arrangements, which would limit the overall effectiveness judgement to Inadequate. Urgent action is required.</p>';
+  } else if(pct<=70){
+    html += '<p>Based on your responses, an inspector would likely identify <strong>some gaps in safeguarding practice</strong>. While core arrangements may be in place, the gaps could lead to a Requires Improvement judgement for leadership and management. Address priority areas before inspection.</p>';
+  } else if(pct<=90){
+    html += '<p>Based on your responses, an inspector would likely find <strong>effective safeguarding with minor areas for development</strong>. Your school demonstrates a strong culture of safeguarding. A few refinements would ensure a confident Good or Outstanding judgement.</p>';
+  } else {
+    html += '<p>Based on your responses, an inspector would likely find <strong>a robust and effective safeguarding culture</strong>. Your compliance position is strong across all areas. Ensure you can evidence each area with documentation, training records, and meeting minutes.</p>';
+  }
+  box.innerHTML = html;
+}
+
+function renderActions(){
+  const el = document.getElementById('actionPlan');
+  let html = '';
+  let count = 0;
+  DATA.forEach((cat,ci) => {
+    cat.items.forEach((item,ii) => {
+      if(!state[ci+'-'+ii]){
+        count++;
+        const cls = item.risk==='critical'?'critical':item.risk==='medium'?'medium':'';
+        html += '<div class="action-item '+cls+'"><h4>'+item.t+'</h4><p><strong>Category:</strong> '+cat.name+'</p><p><strong>Action:</strong> '+item.action+'</p><div class="action-deadline">Deadline: '+item.deadline+'</div></div>';
+      }
+    });
+  });
+  if(count===0) html = '<p style="color:var(--green);text-align:center;padding:16px">All items complete. No actions required.</p>';
+  el.innerHTML = html;
+}
+
+function toggle(key){
+  state[key] = !state[key];
+  if(!state[key]) delete state[key];
+  saveState(state);
+  render();
+}
+
+function resetAll(){
+  if(confirm('Reset all progress? This cannot be undone.')){
+    state = {};
+    saveState(state);
+    render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>

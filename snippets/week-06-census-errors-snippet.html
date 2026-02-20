@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Census Errors — Schoolgle</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#070B12;color:#E6EDF3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:16px}
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;max-width:400px;width:100%;max-height:400px;overflow-y:auto;position:relative}
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#00D4D4;border:1px solid rgba(0,212,212,0.3);border-radius:20px;padding:4px 10px;margin-bottom:12px}
+h2{font-size:19px;line-height:1.3;margin-bottom:14px;font-weight:700}
+.errors{list-style:none;margin-bottom:12px}
+.errors li{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.errors li:last-child{border:none}
+.check{color:#22C55E;font-size:16px;min-width:20px}
+.unchecked{color:rgba(255,255,255,0.2);font-size:16px;min-width:20px;cursor:pointer}
+.stat{text-align:center;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px;margin-bottom:14px;font-size:13px;color:#EF4444;font-weight:600}
+.cta{display:block;width:100%;text-align:center;background:#00D4D4;color:#070B12;font-weight:700;font-size:14px;padding:12px;border-radius:10px;text-decoration:none;transition:opacity .2s}
+.cta:hover{opacity:0.85}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="badge">☕ The Staff Room</div>
+  <h2>The 5 Census errors that cost schools money</h2>
+  <ul class="errors" id="errors">
+    <li onclick="toggle(this)"><span class="unchecked">☐</span>Missing or duplicate UPNs</li>
+    <li onclick="toggle(this)"><span class="unchecked">☐</span>FSM pupils not flagged correctly</li>
+    <li onclick="toggle(this)"><span class="unchecked">☐</span>Wrong absence codes (C vs O)</li>
+    <li onclick="toggle(this)"><span class="unchecked">☐</span>Ethnicity data incomplete</li>
+    <li onclick="toggle(this)"><span class="unchecked">☐</span>SEN provision type mismatched</li>
+  </ul>
+  <div class="stat">Schools lose an average of £1,300 per uncorrected error</div>
+  <a class="cta" href="https://dsumm18.github.io/schoolgle-tools/census-checker.html">Run the Census Readiness Audit →</a>
+</div>
+<script>
+function toggle(li){
+  const s=li.querySelector('span');
+  if(s.classList.contains('unchecked')){s.className='check';s.textContent='☑'}
+  else{s.className='unchecked';s.textContent='☐'}
+}
+</script>
+</body>
+</html>

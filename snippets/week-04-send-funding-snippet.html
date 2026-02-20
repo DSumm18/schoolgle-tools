@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+.send-snippet{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#070B12;color:#E6EDF3;border-radius:12px;padding:24px;max-width:500px;max-height:400px;overflow:hidden;border:1px solid rgba(0,212,212,0.2)}
+.send-snippet *{box-sizing:border-box;margin:0;padding:0}
+.send-snippet .brand{font-size:0.75rem;color:#8B949E;margin-bottom:12px}
+.send-snippet .headline{font-size:1.3rem;font-weight:800;line-height:1.3;margin-bottom:4px}
+.send-snippet .headline span{color:#00D4D4}
+.send-snippet .sub{font-size:0.85rem;color:#8B949E;margin-bottom:16px}
+.send-snippet select{width:100%;padding:10px 14px;border:1px solid rgba(0,212,212,0.2);border-radius:8px;background:#0D1321;color:#E6EDF3;font-size:0.9rem;min-height:44px;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%238B949E'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.send-snippet .result{background:rgba(0,212,212,0.08);border:1px solid rgba(0,212,212,0.2);border-radius:8px;padding:14px;margin-top:12px;display:none}
+.send-snippet .result .val{font-size:1.4rem;font-weight:800;color:#00D4D4}
+.send-snippet .result .lbl{font-size:0.8rem;color:#8B949E}
+.send-snippet .teaser{font-size:0.85rem;color:#8B949E;margin-top:12px}
+.send-snippet .cta{display:inline-block;margin-top:12px;padding:12px 24px;background:#00D4D4;color:#000;font-weight:700;border-radius:8px;text-decoration:none;font-size:0.9rem;min-height:44px;line-height:20px}
+.send-snippet .cta:hover{opacity:0.9}
+.send-snippet .attr{font-size:0.7rem;color:#8B949E;margin-top:12px;opacity:0.7}
+</style>
+</head>
+<body>
+<div class="send-snippet">
+ <div class="brand">Schoolgle | The Staff Room</div>
+ <div class="headline">England's EHCP numbers grew <span>80%</span> in 7 years</div>
+ <div class="sub">From 354,000 to 639,000 children and young people</div>
+ <select id="sn-la" onchange="showLA(this.value)"><option value="">See your Local Authority →</option></select>
+ <div class="result" id="sn-result">
+  <div style="display:flex;gap:20px">
+   <div><div class="val" id="sn-total"></div><div class="lbl">Total EHCPs</div></div>
+   <div><div class="val" id="sn-growth"></div><div class="lbl">Growth since 2018</div></div>
+  </div>
+ </div>
+ <div class="teaser">How does your LA compare? Which areas are growing fastest? See the full breakdown.</div>
+ <a href="send-funding-explorer.html" class="cta">Explore Your LA's SEND Data →</a>
+ <div class="attr">Source: DfE SEN2 Returns, 2018–2025</div>
+</div>
+<script>
+const SD={"Gateshead":{"t":1923,"g":56.2},"Newcastle upon Tyne":{"t":3095,"g":107.7},"North Tyneside":{"t":2298,"g":88.8},"South Tyneside":{"t":1776,"g":39.0},"Sunderland":{"t":3000,"g":88.9},"Hartlepool":{"t":966,"g":65.1},"Middlesbrough":{"t":2019,"g":70.5},"Redcar and Cleveland":{"t":1492,"g":21.3},"Stockton-on-Tees":{"t":2442,"g":68.2},"County Durham":{"t":5390,"g":66.4},"Darlington":{"t":1122,"g":51.4},"Northumberland":{"t":3873,"g":88.2},"Knowsley":{"t":2789,"g":118.7},"Liverpool":{"t":6814,"g":161.3},"St. Helens":{"t":2179,"g":145.4},"Sefton":{"t":3736,"g":158.5},"Wirral":{"t":4858,"g":129.0},"Bolton":{"t":3604,"g":61.5},"Bury":{"t":2804,"g":73.4},"Manchester":{"t":8875,"g":113.2},"Oldham":{"t":3652,"g":77.6},"Rochdale":{"t":2970,"g":69.4},"Salford":{"t":3387,"g":79.3},"Stockport":{"t":3506,"g":59.7},"Tameside":{"t":3473,"g":158.4},"Trafford":{"t":3143,"g":75.8},"Wigan":{"t":3579,"g":98.4},"Halton":{"t":1712,"g":122.0},"Warrington":{"t":2309,"g":47.4},"Lancashire":{"t":12317,"g":74.9},"Blackburn with Darwen":{"t":1522,"g":85.4},"Blackpool":{"t":1661,"g":93.6},"Cheshire East":{"t":4871,"g":133.4},"Cheshire West and Chester":{"t":3808,"g":105.1},"Cumbria":{"t":4489,"g":41.5},"Barnsley":{"t":3044,"g":42.7},"Doncaster":{"t":3142,"g":69.4},"Rotherham":{"t":3623,"g":75.9},"Sheffield":{"t":5952,"g":85.9},"Bradford":{"t":7493,"g":104.0},"Calderdale":{"t":2556,"g":103.0},"Kirklees":{"t":4475,"g":63.3},"Leeds":{"t":6093,"g":58.8},"Wakefield":{"t":3857,"g":100.6},"Kingston upon Hull, City of":{"t":3245,"g":87.7},"East Riding of Yorkshire":{"t":3695,"g":93.9},"North East Lincolnshire":{"t":1983,"g":122.3},"North Lincolnshire":{"t":1664,"g":82.3},"North Yorkshire":{"t":5486,"g":94.2},"York":{"t":1556,"g":83.9},"Derbyshire":{"t":7625,"g":121.1},"Derby":{"t":3735,"g":97.1},"Leicestershire":{"t":7196,"g":70.4},"Leicester":{"t":4057,"g":70.0},"Rutland":{"t":376,"g":90.9},"Nottinghamshire":{"t":5422,"g":91.9},"Nottingham":{"t":1909,"g":87.0},"Lincolnshire":{"t":8420,"g":80.9},"Northamptonshire":{"t":4847,"g":17.9},"Birmingham":{"t":12094,"g":28.2},"Coventry":{"t":3477,"g":66.8},"Dudley":{"t":3805,"g":97.6},"Sandwell":{"t":4064,"g":95.0},"Solihull":{"t":2503,"g":71.3},"Walsall":{"t":4743,"g":135.2},"Wolverhampton":{"t":3148,"g":79.7},"Staffordshire":{"t":8461,"g":75.0},"Stoke-on-Trent":{"t":3405,"g":53.2},"Herefordshire, County of":{"t":1717,"g":82.9},"Worcestershire":{"t":6970,"g":99.0},"Shropshire":{"t":3016,"g":58.2},"Telford and Wrekin":{"t":2439,"g":56.7},"Warwickshire":{"t":6868,"g":78.5},"Luton":{"t":2723,"g":77.7},"Bedford":{"t":2170,"g":81.0},"Central Bedfordshire":{"t":4035,"g":131.0},"Cambridgeshire":{"t":8007,"g":90.7},"Peterborough":{"t":2908,"g":53.0},"Essex":{"t":14240,"g":59.1},"Southend-on-Sea":{"t":1992,"g":51.1},"Thurrock":{"t":2508,"g":63.1},"Hertfordshire":{"t":12920,"g":104.2},"Norfolk":{"t":12147,"g":97.4},"Suffolk":{"t":8837,"g":86.6},"City of London":{"t":26,"g":85.7},"Camden":{"t":1607,"g":16.0},"Greenwich":{"t":3244,"g":90.8},"Hackney":{"t":3681,"g":91.1},"Hammersmith and Fulham":{"t":1779,"g":59.8},"Islington":{"t":2119,"g":70.9},"Kensington and Chelsea":{"t":819,"g":32.7},"Lambeth":{"t":3316,"g":36.8},"Lewisham":{"t":3696,"g":57.7},"Southwark":{"t":3552,"g":58.7},"Tower Hamlets":{"t":4555,"g":60.3},"Wandsworth":{"t":3175,"g":55.5},"Westminster":{"t":1429,"g":31.8},"Barking and Dagenham":{"t":3063,"g":97.9},"Barnet":{"t":4320,"g":82.1},"Bexley":{"t":3267,"g":70.9},"Brent":{"t":3791,"g":74.5},"Bromley":{"t":4395,"g":99.6},"Croydon":{"t":5232,"g":74.5},"Ealing":{"t":4040,"g":58.4},"Enfield":{"t":4970,"g":101.6},"Haringey":{"t":2954,"g":57.4},"Harrow":{"t":2689,"g":63.5},"Havering":{"t":3005,"g":95.9},"Hillingdon":{"t":3469,"g":48.5},"Hounslow":{"t":3382,"g":47.7},"Kingston upon Thames":{"t":1958,"g":68.6},"Merton":{"t":2730,"g":59.5},"Newham":{"t":1199,"g":32.3},"Redbridge":{"t":3391,"g":60.0},"Richmond upon Thames":{"t":2018,"g":47.5},"Sutton":{"t":2582,"g":56.2},"Waltham Forest":{"t":3663,"g":94.8},"Buckinghamshire":{"t":7217,"g":78.0},"Milton Keynes":{"t":2982,"g":65.0},"East Sussex":{"t":4939,"g":43.8},"Brighton and Hove":{"t":2800,"g":88.4},"Hampshire":{"t":17784,"g":115.0},"Portsmouth":{"t":2310,"g":52.7},"Southampton":{"t":2785,"g":83.0},"Bracknell Forest":{"t":1654,"g":113.4},"Windsor and Maidenhead":{"t":1342,"g":43.8},"West Berkshire":{"t":1685,"g":73.5},"Reading":{"t":1966,"g":53.4},"Slough":{"t":2192,"g":62.4},"Wokingham":{"t":2206,"g":136.2},"Kent":{"t":20635,"g":75.4},"Medway":{"t":3041,"g":43.0},"Isle of Wight":{"t":1799,"g":70.4},"Oxfordshire":{"t":7307,"g":105.6},"Surrey":{"t":16069,"g":84.0},"West Sussex":{"t":9301,"g":75.6},"Isles of Scilly":{"t":17,"g":54.5},"Bath and North East Somerset":{"t":2469,"g":93.3},"Bristol, City of":{"t":4931,"g":116.3},"North Somerset":{"t":2644,"g":193.8},"South Gloucestershire":{"t":3236,"g":68.5},"Dorset":{"t":4333,"g":81.1},"Wiltshire":{"t":6383,"g":90.6},"Swindon":{"t":2772,"g":39.5},"Devon":{"t":9848,"g":90.8},"Plymouth":{"t":3081,"g":52.2},"Torbay":{"t":1643,"g":23.4},"Cornwall":{"t":4949,"g":75.9},"Gloucestershire":{"t":6412,"g":75.3},"Somerset":{"t":5725,"g":172.4},"Bournemouth, Christchurch and Poole":{"t":4432,"g":81.0},"North Northamptonshire":{"t":4551,"g":60.1},"West Northamptonshire":{"t":4153,"g":45.9},"Cumberland":{"t":2893,"g":8.9},"Westmorland and Furness":{"t":2377,"g":8.2}};
+const sel=document.getElementById('sn-la');
+Object.keys(SD).sort().forEach(la=>{const o=document.createElement('option');o.value=la;o.textContent=la;sel.appendChild(o)});
+function showLA(la){
+ const r=document.getElementById('sn-result');
+ if(!la){r.style.display='none';return}
+ const d=SD[la];
+ document.getElementById('sn-total').textContent=d.t.toLocaleString('en-GB');
+ document.getElementById('sn-growth').textContent=d.g+'%';
+ r.style.display='block';
+}
+</script>
+</body>
+</html>

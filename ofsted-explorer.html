@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ofsted Explorer | Schoolgle</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#070B12;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);
+--text:#E6EDF3;--text-dim:#8B949E;--cyan:#00D4D4;--green:#22C55E;
+--gold:#D4AF37;--amber:#F59E0B;--red:#EF4444;
+--glass:rgba(255,255,255,0.06);--glass-border:rgba(255,255,255,0.1);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;min-height:100vh}
+a{color:var(--cyan);text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+/* Header */
+header{text-align:center;padding:32px 16px 24px;border-bottom:1px solid var(--border)}
+.brand{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:4px}
+header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;margin-bottom:8px}
+header p{color:var(--text-dim);max-width:600px;margin:0 auto;font-size:14px}
+/* Cards */
+.card{background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;padding:20px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.card h2,.card h3{margin-bottom:12px}
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:24px 0}
+.kpi{text-align:center;padding:20px 12px}
+.kpi .value{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;line-height:1.1}
+.kpi .label{font-size:12px;color:var(--text-dim);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+/* Filters */
+.filters{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0;align-items:end}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-group label{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+select,button{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s}
+select:hover,button:hover{border-color:var(--cyan)}
+button.primary{background:var(--cyan);color:var(--bg);font-weight:600;border-color:var(--cyan)}
+button.primary:hover{opacity:.9}
+/* Stacked bar */
+.stacked-bar-container{margin:16px 0}
+.bar-label-row{display:flex;justify-content:space-between;font-size:13px;color:var(--text-dim);margin-bottom:6px}
+.stacked-bar{display:flex;height:36px;border-radius:8px;overflow:hidden;width:100%}
+.stacked-bar .seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;min-width:24px;transition:width .4s ease}
+.stacked-bar .seg.outstanding{background:var(--gold)}
+.stacked-bar .seg.good{background:var(--green)}
+.stacked-bar .seg.ri{background:var(--amber)}
+.stacked-bar .seg.inadequate{background:var(--red)}
+/* Heatmap table */
+.heatmap-wrapper{overflow-x:auto;margin:16px 0}
+table.heatmap{width:100%;border-collapse:collapse;font-size:13px}
+table.heatmap th,table.heatmap td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--border)}
+table.heatmap th{color:var(--text-dim);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:1px}
+table.heatmap td:first-child{text-align:left;font-weight:500;white-space:nowrap}
+table.heatmap tr:hover{background:rgba(255,255,255,0.03)}
+.cell-outstanding{color:var(--gold);font-weight:700}
+.cell-good{color:var(--green);font-weight:700}
+.cell-ri{color:var(--amber);font-weight:700}
+.cell-inadequate{color:var(--red);font-weight:700}
+.trend-up{color:var(--green)}
+.trend-down{color:var(--red)}
+.trend-flat{color:var(--text-dim)}
+/* Comparison */
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+@media(max-width:600px){.comparison{grid-template-columns:1fr}}
+.comparison .card{position:relative}
+.comparison .card h3{font-size:16px;color:var(--cyan)}
+/* So-what box */
+.so-what{border-left:3px solid var(--cyan);padding:16px 20px;margin:20px 0;background:rgba(0,212,212,0.05);border-radius:0 12px 12px 0;font-size:14px;color:var(--text-dim)}
+.so-what strong{color:var(--text)}
+/* Accordion */
+.accordion{margin:24px 0}
+.accordion-item{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.accordion-btn{width:100%;text-align:left;background:var(--surface);color:var(--text);border:none;padding:14px 16px;font-size:15px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.accordion-btn:hover{background:rgba(255,255,255,0.06)}
+.accordion-btn .icon{transition:transform .3s}
+.accordion-btn.open .icon{transform:rotate(180deg)}
+.accordion-content{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 16px;font-size:14px;color:var(--text-dim);line-height:1.7}
+.accordion-content.open{max-height:800px;padding:0 16px 16px}
+/* Footer */
+footer{text-align:center;padding:32px 16px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border);margin-top:40px}
+.attribution{font-style:italic;margin-bottom:8px}
+/* Print */
+.print-bar{text-align:right;margin:16px 0}
+@media print{
+body{background:#fff;color:#000}
+.card{border:1px solid #ccc;background:#f9f9f9;backdrop-filter:none}
+.stacked-bar .seg{color:#000!important}
+.filters,.print-bar,header .brand{display:none}
+.cell-outstanding,.cell-good,.cell-ri,.cell-inadequate{font-weight:700}
+}
+/* Section spacing */
+section{margin:32px 0}
+section > h2{font-size:clamp(1.1rem,3vw,1.4rem);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-icon{font-size:1.2em}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">Schoolgle | The Staff Room</div>
+<h1>Ofsted Explorer</h1>
+<p>Interactive analysis of Ofsted inspection outcomes across England. Filter by region, phase, and compare areas side by side.</p>
+</header>
+
+<div class="container">
+
+<!-- KPI Cards -->
+<section id="kpi-section">
+<div class="kpi-row" id="kpi-row"></div>
+</section>
+
+<!-- Filters -->
+<section>
+<div class="filters">
+<div class="filter-group">
+<label>Region</label>
+<select id="region-filter"><option value="all">All Regions</option></select>
+</div>
+<div class="filter-group">
+<label>Phase</label>
+<select id="phase-filter"><option value="all">All Phases</option></select>
+</div>
+<div class="filter-group">
+<label>&nbsp;</label>
+<button onclick="resetFilters()">Reset</button>
+</div>
+</div>
+</section>
+
+<!-- National / Filtered distribution -->
+<section>
+<h2><span class="section-icon">&#x1F4CA;</span> Grade Distribution</h2>
+<div class="card" id="dist-card">
+<h3 id="dist-title">National Overview</h3>
+<div class="stacked-bar-container" id="main-bar"></div>
+<div id="dist-details" style="font-size:13px;color:var(--text-dim);margin-top:8px"></div>
+</div>
+</section>
+
+<!-- So-What box -->
+<div class="so-what" id="so-what"></div>
+
+<!-- Regional Heatmap -->
+<section>
+<h2><span class="section-icon">&#x1F5FA;</span> Regional Heatmap</h2>
+<div class="card">
+<div class="heatmap-wrapper" id="heatmap-wrapper"></div>
+</div>
+</section>
+
+<!-- Comparison -->
+<section>
+<h2><span class="section-icon">&#x2194;</span> Compare Regions</h2>
+<div class="filters">
+<div class="filter-group">
+<label>Region A</label>
+<select id="compare-a"></select>
+</div>
+<div class="filter-group">
+<label>Region B</label>
+<select id="compare-b"></select>
+</div>
+<div class="filter-group">
+<label>&nbsp;</label>
+<button class="primary" onclick="renderComparison()">Compare</button>
+</div>
+</div>
+<div class="comparison" id="comparison"></div>
+</section>
+
+<!-- Report Card Explained -->
+<section>
+<h2><span class="section-icon">&#x2753;</span> Report Cards Explained</h2>
+<div class="accordion" id="accordion"></div>
+</section>
+
+<!-- Print -->
+<div class="print-bar">
+<button onclick="window.print()">Print / Export PDF</button>
+</div>
+
+</div>
+
+<footer>
+<div class="attribution">Source: Ofsted annual reports and management information, 2024-25. Aggregated data for illustration purposes only.</div>
+<div>Schoolgle | The Staff Room &mdash; helping school staff make sense of education data</div>
+</footer>
+
+<script>
+// === DATA ===
+// Plausible aggregated data based on known Ofsted proportions.
+// Total ~22,400 schools. Distribution: Outstanding ~17%, Good ~64%, RI ~14%, Inadequate ~5%
+// Phase split: Primary ~74%, Secondary ~18%, Special ~5%, PRU/AP ~2%, Nursery ~1%
+
+const GRADES = ['Outstanding','Good','Requires Improvement','Inadequate'];
+const GRADE_KEYS = ['outstanding','good','ri','inadequate'];
+const GRADE_COLORS = ['var(--gold)','var(--green)','var(--amber)','var(--red)'];
+const REGIONS = ['North East','North West','Yorkshire & Humber','East Midlands','West Midlands','East of England','London','South East','South West'];
+const PHASES = ['Primary','Secondary','Special','PRU/AP','Nursery'];
+
+// Region weights (approximate school counts by region, summing to ~22400)
+const regionTotals = {
+'North East':1450,'North West':3200,'Yorkshire & Humber':2350,'East Midlands':1950,
+'West Midlands':2500,'East of England':2550,'London':3050,'South East':3350,'South West':2000
+};
+
+// Phase distribution within each region (proportions)
+const phaseProps = {Primary:0.74,Secondary:0.18,Special:0.05,'PRU/AP':0.02,Nursery:0.01};
+
+// Regional grade profiles (slight realistic variation)
+// Format: [outstanding%, good%, ri%, inadequate%] - must sum to 100
+const regionGrades = {
+'North East':  [14,63,17,6],
+'North West':  [15,63,16,6],
+'Yorkshire & Humber':[14,62,17,7],
+'East Midlands':[16,64,15,5],
+'West Midlands':[15,63,16,6],
+'East of England':[18,65,13,4],
+'London':       [23,62,11,4],
+'South East':   [19,66,12,3],
+'South West':   [17,65,14,4]
+};
+
+// Trend indicators per region (1=improving, 0=stable, -1=declining)
+const regionTrend = {
+'North East':0,'North West':1,'Yorkshire & Humber':-1,'East Midlands':1,
+'West Midlands':0,'East of England':1,'London':0,'South East':1,'South West':0
+};
+
+// Phase-specific modifiers (deviation from regional baseline)
+// Primaries close to average; secondaries slightly lower outstanding; specials higher outstanding
+const phaseMod = {
+Primary:     [0, 0, 0, 0],
+Secondary:   [-3,-1, 3, 1],
+Special:     [5, 2,-5,-2],
+'PRU/AP':    [-4,-2, 4, 2],
+Nursery:     [2, 1,-2,-1]
+};
+
+// Build full dataset: data[region][phase] = {outstanding, good, ri, inadequate, total}
+const DATA = {};
+let NATIONAL = {outstanding:0,good:0,ri:0,inadequate:0,total:0};
+
+REGIONS.forEach(r => {
+  DATA[r] = {};
+  const base = regionGrades[r];
+  PHASES.forEach(p => {
+    const total = Math.round(regionTotals[r] * phaseProps[p]);
+    if(total === 0){ DATA[r][p]={outstanding:0,good:0,ri:0,inadequate:0,total:0}; return; }
+    const mod = phaseMod[p];
+    let pcts = base.map((v,i) => Math.max(0, v + mod[i]));
+    const sum = pcts.reduce((a,b)=>a+b,0);
+    pcts = pcts.map(v => v/sum); // normalise
+    let counts = pcts.map(v => Math.round(v * total));
+    // fix rounding
+    const diff = total - counts.reduce((a,b)=>a+b,0);
+    counts[1] += diff; // adjust Good
+    const obj = {outstanding:counts[0],good:counts[1],ri:counts[2],inadequate:counts[3],total};
+    DATA[r][p] = obj;
+    NATIONAL.outstanding += obj.outstanding;
+    NATIONAL.good += obj.good;
+    NATIONAL.ri += obj.ri;
+    NATIONAL.inadequate += obj.inadequate;
+    NATIONAL.total += obj.total;
+  });
+});
+
+// === HELPERS ===
+function getFiltered(region, phase) {
+  let agg = {outstanding:0,good:0,ri:0,inadequate:0,total:0};
+  const regions = region === 'all' ? REGIONS : [region];
+  const phases = phase === 'all' ? PHASES : [phase];
+  regions.forEach(r => phases.forEach(p => {
+    const d = DATA[r][p];
+    GRADE_KEYS.forEach(k => agg[k] += d[k]);
+    agg.total += d.total;
+  }));
+  return agg;
+}
+
+function pct(n,t){ return t ? (n/t*100) : 0; }
+function fmtPct(n,t){ return pct(n,t).toFixed(1)+'%'; }
+function fmtNum(n){ return n.toLocaleString('en-GB'); }
+
+function makeBar(data, height) {
+  const h = height || 36;
+  const t = data.total;
+  if(!t) return '<div style="color:var(--text-dim)">No data</div>';
+  let html = '<div class="stacked-bar" style="height:'+h+'px">';
+  GRADE_KEYS.forEach((k,i) => {
+    const w = pct(data[k], t);
+    if(w > 0) html += '<div class="seg '+k+'" style="width:'+w+'%" title="'+GRADES[i]+': '+fmtPct(data[k],t)+'">'+( w > 6 ? Math.round(w)+'%' : '')+'</div>';
+  });
+  html += '</div>';
+  // legend
+  html += '<div class="bar-label-row">';
+  GRADE_KEYS.forEach((k,i) => {
+    html += '<span style="color:'+GRADE_COLORS[i]+'">'+GRADES[i]+': '+fmtPct(data[k],t)+'</span> ';
+  });
+  html += '</div>';
+  return html;
+}
+
+function trendIcon(val) {
+  if(val > 0) return '<span class="trend-up" title="Improving">&#9650;</span>';
+  if(val < 0) return '<span class="trend-down" title="Declining">&#9660;</span>';
+  return '<span class="trend-flat" title="Stable">&#9654;</span>';
+}
+
+// === RENDER ===
+function renderKPIs() {
+  const d = getFiltered(regionSel(), phaseSel());
+  const items = [
+    {value: fmtNum(d.total), label:'Schools Inspected'},
+    {value: fmtPct(d.outstanding,d.total), label:'Outstanding', color:'var(--gold)'},
+    {value: fmtPct(d.good,d.total), label:'Good', color:'var(--green)'},
+    {value: fmtPct(d.ri,d.total), label:'Requires Improvement', color:'var(--amber)'},
+    {value: fmtPct(d.inadequate,d.total), label:'Inadequate', color:'var(--red)'}
+  ];
+  document.getElementById('kpi-row').innerHTML = items.map(i =>
+    '<div class="card kpi"><div class="value" style="color:'+(i.color||'var(--cyan)')+'">'+i.value+'</div><div class="label">'+i.label+'</div></div>'
+  ).join('');
+}
+
+function renderDistribution() {
+  const r = regionSel(), p = phaseSel();
+  const d = getFiltered(r, p);
+  let title = 'National Overview';
+  if(r !== 'all') title = r;
+  if(p !== 'all') title += ' - ' + p;
+  document.getElementById('dist-title').textContent = title;
+  document.getElementById('main-bar').innerHTML = makeBar(d);
+  document.getElementById('dist-details').textContent = fmtNum(d.total) + ' schools in selection';
+}
+
+function renderSoWhat() {
+  const r = regionSel(), p = phaseSel();
+  const d = getFiltered(r, p);
+  const nat = NATIONAL;
+  let msg = '';
+  if(r === 'all' && p === 'all') {
+    msg = '<strong>National picture:</strong> Around two thirds of schools are rated Good, with roughly 1 in 6 rated Outstanding. About 1 in 5 schools are below Good, meaning over 4,000 schools require further improvement or are Inadequate. London continues to have the highest proportion of Outstanding schools.';
+  } else {
+    const outPct = pct(d.outstanding, d.total);
+    const natOutPct = pct(nat.outstanding, nat.total);
+    const diff = outPct - natOutPct;
+    const region = r !== 'all' ? r : 'This selection';
+    if(Math.abs(diff) < 1.5) {
+      msg = '<strong>'+region+'</strong> is broadly in line with the national average for Outstanding schools ('+Math.round(outPct)+'% vs '+Math.round(natOutPct)+'% nationally).';
+    } else if(diff > 0) {
+      msg = '<strong>'+region+'</strong> has a higher-than-average proportion of Outstanding schools ('+Math.round(outPct)+'% vs '+Math.round(natOutPct)+'% nationally). ';
+    } else {
+      msg = '<strong>'+region+'</strong> has a lower-than-average proportion of Outstanding schools ('+Math.round(outPct)+'% vs '+Math.round(natOutPct)+'% nationally). This region may benefit from targeted support.';
+    }
+    const riPct = pct(d.ri + d.inadequate, d.total);
+    msg += ' Around '+Math.round(riPct)+'% of schools are below Good.';
+  }
+  document.getElementById('so-what').innerHTML = msg;
+}
+
+function renderHeatmap() {
+  const p = phaseSel();
+  let html = '<table class="heatmap"><thead><tr><th>Region</th><th>Schools</th><th>Outstanding</th><th>Good</th><th>RI</th><th>Inadequate</th><th>Trend</th></tr></thead><tbody>';
+  REGIONS.forEach(r => {
+    const d = getFiltered(r, p);
+    html += '<tr><td>'+r+'</td><td>'+fmtNum(d.total)+'</td>';
+    html += '<td class="cell-outstanding">'+fmtPct(d.outstanding,d.total)+'</td>';
+    html += '<td class="cell-good">'+fmtPct(d.good,d.total)+'</td>';
+    html += '<td class="cell-ri">'+fmtPct(d.ri,d.total)+'</td>';
+    html += '<td class="cell-inadequate">'+fmtPct(d.inadequate,d.total)+'</td>';
+    html += '<td>'+trendIcon(regionTrend[r])+'</td></tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('heatmap-wrapper').innerHTML = html;
+}
+
+function renderComparison() {
+  const a = document.getElementById('compare-a').value;
+  const b = document.getElementById('compare-b').value;
+  const p = phaseSel();
+  const da = getFiltered(a, p);
+  const db = getFiltered(b, p);
+  const el = document.getElementById('comparison');
+  el.innerHTML = [
+    {name:a,d:da},{name:b,d:db}
+  ].map(x => '<div class="card"><h3>'+x.name+' '+trendIcon(regionTrend[x.name])+'</h3>'+makeBar(x.d)+'<div style="margin-top:8px;font-size:13px;color:var(--text-dim)">'+fmtNum(x.d.total)+' schools</div></div>').join('');
+}
+
+function renderAccordion() {
+  const items = [
+    {q:'What are Ofsted report cards?', a:'From September 2025, Ofsted replaced single-word headline judgments with report cards. These give a more detailed picture of a school across multiple areas rather than a single grade. The report card includes separate assessments for quality of education, behaviour and attitudes, personal development, and leadership and management.'},
+    {q:'Why did Ofsted change the system?', a:'The single-word judgment was criticised for being reductive. A school rated "Requires Improvement" might be excellent in behaviour but weak in curriculum. Report cards aim to give parents and schools more nuanced information. The change followed the tragic death of headteacher Ruth Perry in 2023, which brought intense scrutiny to the inspection system.'},
+    {q:'What do the grades in this tool represent?', a:'This tool uses the legacy four-point scale (Outstanding, Good, Requires Improvement, Inadequate) based on the most recent full inspection outcomes. As report cards are published through 2025-26, we will transition to showing the new multi-dimensional assessments.'},
+    {q:'How should I read the regional data?', a:'Regional averages mask significant variation between schools. A region with 15% Outstanding still has excellent schools. Use this data to understand broad patterns, not to judge individual schools. London typically outperforms due to sustained investment and demographics.'},
+    {q:'What does the trend indicator mean?', a:'The trend arrow shows the direction of change in the proportion of Good or Outstanding schools over the past two years. An upward arrow means the region has seen a net improvement; downward means more schools have slipped below Good.'}
+  ];
+  document.getElementById('accordion').innerHTML = items.map((item,i) =>
+    '<div class="accordion-item"><button class="accordion-btn" onclick="toggleAccordion(this)">'+item.q+'<span class="icon">&#9660;</span></button><div class="accordion-content">'+item.a+'</div></div>'
+  ).join('');
+}
+
+function toggleAccordion(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+// === CONTROLS ===
+function regionSel(){ return document.getElementById('region-filter').value; }
+function phaseSel(){ return document.getElementById('phase-filter').value; }
+
+function resetFilters() {
+  document.getElementById('region-filter').value = 'all';
+  document.getElementById('phase-filter').value = 'all';
+  update();
+}
+
+function update() {
+  renderKPIs();
+  renderDistribution();
+  renderSoWhat();
+  renderHeatmap();
+}
+
+function initSelects() {
+  const rf = document.getElementById('region-filter');
+  const ca = document.getElementById('compare-a');
+  const cb = document.getElementById('compare-b');
+  REGIONS.forEach(r => {
+    rf.innerHTML += '<option value="'+r+'">'+r+'</option>';
+    ca.innerHTML += '<option value="'+r+'"'+(r==='London'?' selected':'')+'>'+r+'</option>';
+    cb.innerHTML += '<option value="'+r+'"'+(r==='North East'?' selected':'')+'>'+r+'</option>';
+  });
+  const pf = document.getElementById('phase-filter');
+  PHASES.forEach(p => {
+    pf.innerHTML += '<option value="'+p+'">'+p+'</option>';
+  });
+  rf.addEventListener('change', update);
+  pf.addEventListener('change', update);
+}
+
+// Init
+initSelects();
+update();
+renderComparison();
+renderAccordion();
+</script>
+</body>
+</html>

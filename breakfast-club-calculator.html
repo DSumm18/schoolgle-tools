@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breakfast Club Cost Calculator — Schoolgle</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #070B12; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+  --text: #E6EDF3; --muted: #8B949E; --cyan: #00D4D4; --green: #22C55E;
+  --red: #EF4444; --amber: #F59E0B; --glass: rgba(255,255,255,0.06);
+}
+html { font-size: 16px; scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; min-height: 100vh; }
+.container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+/* Header */
+.header { text-align: center; margin-bottom: 2rem; }
+.brand { font-size: 0.85rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.25rem; }
+.brand span { color: var(--cyan); }
+h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700; margin-bottom: 0.5rem; }
+h1 em { font-style: normal; color: var(--cyan); }
+.subtitle { color: var(--muted); font-size: 0.95rem; max-width: 600px; margin: 0 auto; }
+
+/* Cards */
+.card { background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; }
+.card h2 { font-size: 1.1rem; color: var(--cyan); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+/* Sliders */
+.input-group { margin-bottom: 1.25rem; }
+.input-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem; }
+.input-label label { font-size: 0.9rem; color: var(--muted); }
+.input-label .value { font-size: 1rem; font-weight: 600; color: var(--text); min-width: 80px; text-align: right; }
+input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); outline: none; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--cyan); cursor: pointer; border: 2px solid var(--bg); box-shadow: 0 0 8px rgba(0,212,212,0.4); }
+input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--cyan); cursor: pointer; border: 2px solid var(--bg); }
+
+/* Session buttons */
+.session-btns { display: flex; gap: 0.5rem; }
+.session-btns button { flex: 1; padding: 0.6rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--muted); font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+.session-btns button.active { background: rgba(0,212,212,0.15); border-color: var(--cyan); color: var(--cyan); font-weight: 600; }
+.session-btns button:hover { border-color: var(--cyan); }
+
+/* Staff override */
+.staff-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
+.staff-row .auto-val { font-size: 1.1rem; font-weight: 700; color: var(--cyan); min-width: 30px; text-align: center; }
+.staff-row button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.staff-row button:hover { border-color: var(--cyan); }
+.staff-row .note { font-size: 0.8rem; color: var(--muted); }
+
+/* KPI Grid */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+.kpi { background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem 1.25rem; }
+.kpi .kpi-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
+.kpi .kpi-value { font-size: 1.5rem; font-weight: 700; }
+.kpi.highlight { border-color: var(--cyan); background: rgba(0,212,212,0.06); }
+.kpi.surplus .kpi-value { color: var(--green); }
+.kpi.deficit .kpi-value { color: var(--red); }
+
+/* Chart */
+.chart-area { position: relative; height: 280px; margin: 1rem 0; }
+.bars { display: flex; align-items: flex-end; justify-content: center; gap: 2rem; height: 220px; padding: 0 2rem; }
+.bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; flex: 1; max-width: 180px; }
+.bar { width: 100%; border-radius: 8px 8px 0 0; transition: height 0.4s ease; min-height: 4px; position: relative; }
+.bar.cost { background: linear-gradient(180deg, var(--amber), #d97706); }
+.bar.funding { background: linear-gradient(180deg, var(--cyan), #0891b2); }
+.bar-amount { font-size: 0.85rem; font-weight: 600; text-align: center; }
+.bar-label { font-size: 0.8rem; color: var(--muted); text-align: center; }
+.breakeven-line { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--green); display: flex; align-items: center; transition: top 0.4s ease; }
+.breakeven-tag { position: absolute; right: 0; top: -22px; font-size: 0.75rem; color: var(--green); background: rgba(34,197,94,0.15); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+
+/* So What */
+.so-what { border-left: 3px solid var(--cyan); padding-left: 1rem; }
+.so-what p { margin-bottom: 0.5rem; font-size: 0.95rem; }
+.so-what .verdict { font-size: 1.05rem; font-weight: 600; }
+.so-what .verdict.good { color: var(--green); }
+.so-what .verdict.bad { color: var(--red); }
+.so-what .tip { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+
+/* Scenario buttons */
+.scenario-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.scenario-btns button { padding: 0.5rem 1rem; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+.scenario-btns button:hover { border-color: var(--cyan); background: rgba(0,212,212,0.1); }
+
+/* Footer */
+.footer { text-align: center; margin-top: 2rem; padding: 1.5rem 0; border-top: 1px solid var(--border); }
+.footer p { font-size: 0.8rem; color: var(--muted); }
+
+/* Print */
+@media print {
+  body { background: #fff; color: #111; }
+  .card, .kpi { background: #f9f9f9; border: 1px solid #ddd; backdrop-filter: none; }
+  .kpi .kpi-value { color: #111; }
+  .kpi.surplus .kpi-value { color: #16a34a; }
+  .kpi.deficit .kpi-value { color: #dc2626; }
+  input[type=range], .session-btns button, .scenario-btns button, .staff-row button { display: none; }
+  .staff-row .auto-val, .input-label .value { color: #111; }
+  .brand, .subtitle, .footer p, .bar-label, .kpi .kpi-label { color: #555; }
+  h1, h2 { color: #111; }
+  .breakeven-tag { color: #16a34a; background: #dcfce7; }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .bars { gap: 1rem; padding: 0 0.5rem; }
+  .session-btns { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="brand">Schoolgle | <span>The Staff Room</span></div>
+    <h1>🥣 Breakfast Club <em>Cost Calculator</em></h1>
+    <p class="subtitle">Model costs, staffing, and government funding for your school's breakfast club provision from April 2026.</p>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="card">
+    <h2>📊 Your School</h2>
+
+    <div class="input-group">
+      <div class="input-label"><label>Pupils on roll</label><span class="value" id="v-pupils">420</span></div>
+      <input type="range" id="pupils" min="100" max="800" value="420" step="10">
+    </div>
+
+    <div class="input-group">
+      <div class="input-label"><label>Expected uptake</label><span class="value" id="v-uptake">40%</span></div>
+      <input type="range" id="uptake" min="20" max="80" value="40" step="1">
+    </div>
+
+    <div class="input-group">
+      <div class="input-label"><label>Staff needed</label><span class="note" id="staff-note">(1 per 20 pupils)</span></div>
+      <div class="staff-row">
+        <button onclick="adjustStaff(-1)">−</button>
+        <span class="auto-val" id="v-staff">9</span>
+        <button onclick="adjustStaff(1)">+</button>
+        <span class="note" id="staff-auto">(auto-calculated)</span>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label"><label>Staff hourly rate</label><span class="value" id="v-rate">£12.50</span></div>
+      <input type="range" id="rate" min="10" max="25" value="12.5" step="0.50">
+    </div>
+
+    <div class="input-group">
+      <div class="input-label"><label>Session length</label></div>
+      <div class="session-btns">
+        <button data-mins="30" onclick="setSession(30)">30 min</button>
+        <button data-mins="45" class="active" onclick="setSession(45)">45 min</button>
+        <button data-mins="60" onclick="setSession(60)">60 min</button>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label"><label>Food cost per pupil per day</label><span class="value" id="v-food">£0.50</span></div>
+      <input type="range" id="food" min="0.30" max="1.50" value="0.50" step="0.05">
+    </div>
+
+    <div class="input-group">
+      <div class="input-label"><label>School days per year</label><span class="value" id="v-days">190</span></div>
+      <input type="range" id="days" min="170" max="200" value="190" step="1">
+    </div>
+  </div>
+
+  <!-- SCENARIOS -->
+  <div class="card">
+    <h2>⚡ Quick Scenarios</h2>
+    <div class="scenario-btns">
+      <button onclick="setScenario(20)">Low uptake (20%)</button>
+      <button onclick="setScenario(40)">Medium (40%)</button>
+      <button onclick="setScenario(60)">High (60%)</button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi highlight"><div class="kpi-label">Daily Attendees</div><div class="kpi-value" id="k-attend">168</div></div>
+    <div class="kpi"><div class="kpi-label">Annual Staff Cost</div><div class="kpi-value" id="k-staff">—</div></div>
+    <div class="kpi"><div class="kpi-label">Annual Food Cost</div><div class="kpi-value" id="k-food">—</div></div>
+    <div class="kpi"><div class="kpi-label">Total Annual Cost</div><div class="kpi-value" id="k-total">—</div></div>
+    <div class="kpi highlight"><div class="kpi-label">Govt Funding (£3.50/pupil/day)</div><div class="kpi-value" id="k-funding">—</div></div>
+    <div class="kpi"><div class="kpi-label">Cost Per Pupil Per Day</div><div class="kpi-value" id="k-cpp">—</div></div>
+    <div class="kpi" id="kpi-result"><div class="kpi-label">Surplus / Deficit</div><div class="kpi-value" id="k-result">—</div></div>
+    <div class="kpi"><div class="kpi-label">Break-even Uptake</div><div class="kpi-value" id="k-breakeven">—</div></div>
+  </div>
+
+  <!-- CHART -->
+  <div class="card">
+    <h2>📈 Cost vs Funding</h2>
+    <div class="chart-area">
+      <div class="bars">
+        <div class="bar-wrap">
+          <div class="bar-amount" id="c-cost-amt">—</div>
+          <div class="bar cost" id="c-cost" style="height:50%"></div>
+          <div class="bar-label">Your Cost</div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-amount" id="c-fund-amt">—</div>
+          <div class="bar funding" id="c-fund" style="height:70%"></div>
+          <div class="bar-label">Govt Funding</div>
+        </div>
+      </div>
+      <div class="breakeven-line" id="breakeven-line" style="top:60%">
+        <span class="breakeven-tag" id="breakeven-tag">Break-even: 35%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SO WHAT -->
+  <div class="card">
+    <h2>💡 So What Does This Mean?</h2>
+    <div class="so-what" id="so-what"></div>
+  </div>
+
+  <div class="footer">
+    <p>Based on DfE breakfast club funding announcement, 2026. Rates may vary by region.</p>
+    <p style="margin-top:0.3rem">Built by Schoolgle — tools for school leaders who think ahead.</p>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => '£' + Math.round(n).toLocaleString('en-GB');
+
+let sessionMins = 45;
+let staffOverride = null;
+
+function getVals() {
+  const pupils = +$('pupils').value;
+  const uptake = +$('uptake').value;
+  const rate = +$('rate').value;
+  const foodCost = +$('food').value;
+  const days = +$('days').value;
+  const dailyAtt = Math.round(pupils * uptake / 100);
+  const autoStaff = Math.ceil(dailyAtt / 20);
+  const staff = staffOverride !== null ? staffOverride : autoStaff;
+  const dailyStaff = staff * rate * (sessionMins / 60);
+  const annualStaff = dailyStaff * days;
+  const annualFood = dailyAtt * foodCost * days;
+  const totalCost = annualStaff + annualFood;
+  const annualFunding = dailyAtt * 3.50 * days;
+  const surplus = annualFunding - totalCost;
+  const cpp = dailyAtt > 0 ? totalCost / (dailyAtt * days) : 0;
+
+  // Break-even: solve for uptake where funding = cost
+  // funding = pupils*u/100 * 3.5 * days
+  // cost = ceil(pupils*u/100/20) * rate * sessionMins/60 * days + pupils*u/100 * foodCost * days
+  // Approximate: ignore ceil, staff = pupils*u/100/20
+  // 3.5 = rate*(sessionMins/60)/20 + foodCost  → u cancels, so breakeven is independent of u if linear
+  // Actually with ceil it's step-function. Let's find numerically:
+  let beUptake = null;
+  for (let u = 1; u <= 100; u++) {
+    const a = Math.round(pupils * u / 100);
+    const s = Math.ceil(a / 20);
+    const c = s * rate * (sessionMins / 60) * days + a * foodCost * days;
+    const f = a * 3.50 * days;
+    if (f >= c) { beUptake = u; break; }
+  }
+
+  return { pupils, uptake, dailyAtt, autoStaff, staff, annualStaff, annualFood, totalCost, annualFunding, surplus, cpp, beUptake, days };
+}
+
+function update() {
+  const v = getVals();
+
+  // Labels
+  $('v-pupils').textContent = v.pupils;
+  $('v-uptake').textContent = v.uptake + '%';
+  $('v-rate').textContent = '£' + (+$('rate').value).toFixed(2);
+  $('v-food').textContent = '£' + (+$('food').value).toFixed(2);
+  $('v-days').textContent = $('days').value;
+
+  // Staff
+  if (staffOverride === null) {
+    $('v-staff').textContent = v.autoStaff;
+    $('staff-auto').textContent = '(auto-calculated)';
+  } else {
+    $('v-staff').textContent = staffOverride;
+    $('staff-auto').textContent = '(manual — auto: ' + v.autoStaff + ')';
+  }
+
+  // KPIs
+  $('k-attend').textContent = v.dailyAtt;
+  $('k-staff').textContent = fmt(v.annualStaff);
+  $('k-food').textContent = fmt(v.annualFood);
+  $('k-total').textContent = fmt(v.totalCost);
+  $('k-funding').textContent = fmt(v.annualFunding);
+  $('k-cpp').textContent = '£' + v.cpp.toFixed(2);
+  $('k-result').textContent = (v.surplus >= 0 ? '+' : '') + fmt(v.surplus);
+
+  const kpiEl = $('kpi-result');
+  kpiEl.className = 'kpi ' + (v.surplus >= 0 ? 'surplus' : 'deficit');
+
+  $('k-breakeven').textContent = v.beUptake !== null ? v.beUptake + '% uptake' : 'N/A (always deficit)';
+
+  // Chart
+  const maxVal = Math.max(v.totalCost, v.annualFunding, 1);
+  $('c-cost').style.height = (v.totalCost / maxVal * 200) + 'px';
+  $('c-fund').style.height = (v.annualFunding / maxVal * 200) + 'px';
+  $('c-cost-amt').textContent = fmt(v.totalCost);
+  $('c-fund-amt').textContent = fmt(v.annualFunding);
+
+  // Break-even line
+  if (v.beUptake !== null) {
+    // Position based on cost at break-even
+    const beAtt = Math.round(v.pupils * v.beUptake / 100);
+    const beFunding = beAtt * 3.50 * v.days;
+    const linePos = 220 - (beFunding / maxVal * 200);
+    $('breakeven-line').style.top = Math.max(0, linePos) + 'px';
+    $('breakeven-tag').textContent = 'Break-even: ' + v.beUptake + '% uptake';
+    $('breakeven-line').style.display = '';
+  } else {
+    $('breakeven-line').style.display = 'none';
+  }
+
+  // So What
+  let html = '';
+  if (v.surplus >= 0) {
+    html += '<p class="verdict good">✅ At ' + v.uptake + '% uptake, the funding covers costs with ' + fmt(v.surplus) + ' surplus per year.</p>';
+  } else {
+    html += '<p class="verdict bad">⚠️ At ' + v.uptake + '% uptake, you\'ll need to find ' + fmt(Math.abs(v.surplus)) + ' from other budgets.</p>';
+  }
+  if (v.beUptake !== null) {
+    html += '<p>The funding breaks even at around <strong>' + v.beUptake + '% uptake</strong> with your current cost settings.</p>';
+  } else {
+    html += '<p>With these cost settings, the government funding doesn\'t cover costs at any uptake level. Consider reducing session length or staff rates.</p>';
+  }
+  html += '<p class="tip">Consider: will you need new furniture? Storage? Kitchen equipment? These capital costs aren\'t included above.</p>';
+  $('so-what').innerHTML = html;
+}
+
+function setSession(mins) {
+  sessionMins = mins;
+  document.querySelectorAll('.session-btns button').forEach(b => b.classList.toggle('active', +b.dataset.mins === mins));
+  update();
+}
+
+function adjustStaff(delta) {
+  const v = getVals();
+  const current = staffOverride !== null ? staffOverride : v.autoStaff;
+  const next = Math.max(1, current + delta);
+  staffOverride = next === v.autoStaff ? null : next;
+  update();
+}
+
+function setScenario(uptake) {
+  $('uptake').value = uptake;
+  staffOverride = null;
+  update();
+}
+
+// Attach listeners
+['pupils','uptake','rate','food','days'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    if (id === 'pupils' || id === 'uptake') staffOverride = null;
+    update();
+  });
+});
+
+update();
+</script>
+</body>
+</html>

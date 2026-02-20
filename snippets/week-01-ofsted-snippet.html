@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 1: Ofsted Report Cards | Schoolgle</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#070B12;--text:#E6EDF3;--dim:#8B949E;--cyan:#00D4D4;--green:#22C55E;--gold:#D4AF37;--amber:#F59E0B;--red:#EF4444;--glass:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.1)}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6}
+.snippet{max-width:600px;margin:0 auto;padding:24px 16px}
+.brand{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:12px}
+h1{font-size:clamp(1.2rem,3.5vw,1.6rem);font-weight:700;margin-bottom:8px}
+.subtitle{color:var(--dim);font-size:14px;margin-bottom:20px}
+.card{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;backdrop-filter:blur(12px)}
+.bar-wrap{margin:12px 0}
+.bar{display:flex;height:32px;border-radius:8px;overflow:hidden}
+.bar .s{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:12px}
+.legend span{display:flex;align-items:center;gap:4px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+select{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;width:100%;margin:8px 0;cursor:pointer}
+select:hover{border-color:var(--cyan)}
+.region-bar{margin-top:8px;display:none}
+.region-bar.active{display:block}
+.teaser{color:var(--dim);font-size:13px;font-style:italic;margin:12px 0}
+.cta{display:inline-block;background:var(--cyan);color:var(--bg);font-weight:700;padding:12px 24px;border-radius:8px;text-decoration:none;font-size:15px;margin-top:8px;transition:opacity .2s}
+.cta:hover{opacity:.85}
+.attr{font-size:11px;color:var(--dim);margin-top:16px;font-style:italic}
+</style>
+</head>
+<body>
+<div class="snippet">
+<div class="brand">Schoolgle | The Staff Room</div>
+<h1>Ofsted's new report cards: what the first wave tells us</h1>
+<p class="subtitle">A snapshot of inspection outcomes across England</p>
+
+<div class="card">
+<div style="font-size:13px;color:var(--dim);margin-bottom:4px">National grade distribution (22,400 schools)</div>
+<div class="bar-wrap">
+<div class="bar">
+<div class="s" style="width:17%;background:var(--gold)">17%</div>
+<div class="s" style="width:64%;background:var(--green)">64%</div>
+<div class="s" style="width:14%;background:var(--amber)">14%</div>
+<div class="s" style="width:5%;background:var(--red)">5%</div>
+</div>
+<div class="legend">
+<span><span class="dot" style="background:var(--gold)"></span> Outstanding</span>
+<span><span class="dot" style="background:var(--green)"></span> Good</span>
+<span><span class="dot" style="background:var(--amber)"></span> Requires Improvement</span>
+<span><span class="dot" style="background:var(--red)"></span> Inadequate</span>
+</div>
+</div>
+</div>
+
+<div class="card">
+<label style="font-size:13px;color:var(--dim)">See your region</label>
+<select id="region-sel" onchange="showRegion(this.value)">
+<option value="">Select a region...</option>
+<option value="ne">North East</option>
+<option value="nw">North West</option>
+<option value="yh">Yorkshire &amp; Humber</option>
+<option value="em">East Midlands</option>
+<option value="wm">West Midlands</option>
+<option value="ee">East of England</option>
+<option value="lo">London</option>
+<option value="se">South East</option>
+<option value="sw">South West</option>
+</select>
+<div id="region-display"></div>
+</div>
+
+<p class="teaser">How does your region compare? Filter by phase, compare areas, explore trend data...</p>
+
+<a class="cta" href="ofsted-explorer.html">Explore Ofsted Data &#8594;</a>
+
+<p class="attr">Source: Ofsted annual reports and management information, 2024-25. Aggregated data for illustration purposes only.</p>
+</div>
+
+<script>
+var regions={
+ne:[14,63,17,6],nw:[15,63,16,6],yh:[14,62,17,7],
+em:[16,64,15,5],wm:[15,63,16,6],ee:[18,65,13,4],
+lo:[23,62,11,4],se:[19,66,12,3],sw:[17,65,14,4]
+};
+var names={ne:'North East',nw:'North West',yh:'Yorkshire & Humber',em:'East Midlands',wm:'West Midlands',ee:'East of England',lo:'London',se:'South East',sw:'South West'};
+var colors=['var(--gold)','var(--green)','var(--amber)','var(--red)'];
+var labels=['Outstanding','Good','RI','Inadequate'];
+
+function showRegion(k){
+var el=document.getElementById('region-display');
+if(!k||!regions[k]){el.innerHTML='';return;}
+var d=regions[k];
+var html='<div style="font-size:13px;color:var(--dim);margin:8px 0 4px">'+names[k]+'</div><div class="bar-wrap"><div class="bar">';
+for(var i=0;i<4;i++){
+html+='<div class="s" style="width:'+d[i]+'%;background:'+colors[i]+'">'+(d[i]>5?d[i]+'%':'')+'</div>';
+}
+html+='</div></div>';
+el.innerHTML=html;
+}
+</script>
+</body>
+</html>
