@@ -723,19 +723,17 @@
       .join('');
 
     elements.annualSaving.textContent = formatGBP(annualSaving);
-    elements.savingBreakdown.textContent = `Based on ${product.ordersPerYear} orders/year and current product pricing.`;
+    elements.savingBreakdown.textContent = `Based on ${product.ordersPerYear} orders/year for this product alone. School-wide savings shown below.`;
 
-    const station = Math.round((annualSaving * product.categoryBars.stationery) / 100);
-    const paper = Math.round((annualSaving * product.categoryBars.paper) / 100);
-    const furniture = Math.round((annualSaving * product.categoryBars.furniture) / 100);
-
+    // Show school-wide projected savings (based on average school spend of £45k/year on supplies)
+    const schoolWideSavings = { stationery: 1850, paper: 1200, furniture: 4100 };
     elements.barStationery.style.width = `${product.categoryBars.stationery}%`;
     elements.barPaper.style.width = `${product.categoryBars.paper}%`;
     elements.barFurniture.style.width = `${product.categoryBars.furniture}%`;
 
-    elements.barStationeryValue.textContent = formatGBPShort(station || 1000);
-    elements.barPaperValue.textContent = formatGBPShort(paper || 900);
-    elements.barFurnitureValue.textContent = formatGBPShort(furniture || 1200);
+    elements.barStationeryValue.textContent = formatGBPShort(schoolWideSavings.stationery);
+    elements.barPaperValue.textContent = formatGBPShort(schoolWideSavings.paper);
+    elements.barFurnitureValue.textContent = formatGBPShort(schoolWideSavings.furniture);
 
     elements.results.classList.add('show');
   }
