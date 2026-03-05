@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealFind — Smart Procurement for Schools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;600;700&display=swap');
+
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-soft: #172133;
+    --text: #cbd5e1;
+    --text-strong: #f8fafc;
+    --text-muted: #64748b;
+    --border: #334155;
+    --border-soft: #1e293b;
+    --primary: #0ea5e9;
+    --teal: #00baa7;
+    --good: #22c55e;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+    --shadow: 0 16px 40px rgba(2, 6, 23, 0.35);
+  }
+
+  body.light {
+    --bg: #f1f5f9;
+    --panel: #ffffff;
+    --panel-soft: #f8fafc;
+    --text: #334155;
+    --text-strong: #0f172a;
+    --text-muted: #64748b;
+    --border: #cbd5e1;
+    --border-soft: #e2e8f0;
+    --shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 15% -10%, rgba(14, 165, 233, 0.22), transparent 40%),
+      radial-gradient(circle at 100% 0%, rgba(0, 186, 167, 0.18), transparent 35%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    min-height: 100vh;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  .header {
+    border-bottom: 2px solid;
+    border-image: linear-gradient(90deg, var(--primary), var(--teal), var(--primary)) 1;
+    padding-bottom: 24px;
+    margin-bottom: 34px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .brand h1 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: clamp(1.9rem, 3.5vw, 2.5rem);
+    color: var(--text-strong);
+    letter-spacing: 0.6px;
+  }
+
+  .brand h1 span { color: var(--primary); font-weight: 700; }
+
+  .subtitle {
+    font-size: 0.76rem;
+    letter-spacing: 3.2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .theme-toggle {
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.14), rgba(0, 186, 167, 0.12));
+    color: var(--text-strong);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.75));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(4px);
+  }
+
+  body.light .hero { background: linear-gradient(135deg, #ffffff, #f8fafc); }
+
+  .hero h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    color: var(--text-strong);
+    line-height: 1.25;
+  }
+
+  .hero p {
+    margin-top: 12px;
+    color: var(--text);
+    max-width: 800px;
+  }
+
+  .search-wrap {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap input {
+    flex: 1;
+    min-width: 220px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: rgba(15, 23, 42, 0.7);
+    color: var(--text-strong);
+    padding: 14px 16px;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  body.light .search-wrap input { background: #ffffff; }
+
+  .search-wrap input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+  }
+
+  .btn {
+    border: 0;
+    border-radius: 11px;
+    padding: 14px 20px;
+    font-weight: 700;
+    font-size: 0.97rem;
+    cursor: pointer;
+    background: linear-gradient(90deg, var(--primary), #0284c7);
+    color: #fff;
+  }
+
+  .search-hint {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .results {
+    margin-top: 28px;
+    opacity: 0;
+    transform: translateY(14px);
+    pointer-events: none;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+
+  .results.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .section-title {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-strong);
+    font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+    margin-bottom: 14px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.2fr 1.8fr;
+    gap: 16px;
+  }
+
+  .card {
+    background: linear-gradient(135deg, var(--panel), var(--panel-soft));
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .product-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .product-image {
+    width: 78px;
+    height: 78px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(0, 186, 167, 0.18));
+    display: grid;
+    place-content: center;
+    color: var(--text-strong);
+    font-size: 1.5rem;
+  }
+
+  .label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+  }
+
+  .price {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.8rem;
+    color: var(--text-strong);
+    margin-top: 4px;
+    line-height: 1;
+  }
+
+  .price small {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-left: 6px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .tag-blue { background: rgba(14, 165, 233, 0.14); color: #38bdf8; }
+  .tag-green { background: rgba(34, 197, 94, 0.14); color: #4ade80; }
+  .tag-neutral { background: rgba(148, 163, 184, 0.14); color: var(--text); }
+
+  .alts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .alt {
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 14px;
+    background: rgba(15, 23, 42, 0.45);
+    position: relative;
+    overflow: hidden;
+  }
+
+  body.light .alt { background: rgba(248, 250, 252, 0.9); }
+
+  .alt.best { border-color: rgba(34, 197, 94, 0.65); }
+
+  .best-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.66rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #14532d;
+    background: #86efac;
+    padding: 4px 8px;
+    border-radius: 999px;
+  }
+
+  .alt h4 {
+    color: var(--text-strong);
+    margin-right: 86px;
+    font-size: 0.98rem;
+  }
+
+  .muted { color: var(--text-muted); font-size: 0.82rem; }
+
+  .saving {
+    margin-top: 10px;
+    color: #22c55e;
+    font-weight: 700;
+    font-size: 0.92rem;
+  }
+
+  .dashboard,
+  .compliance,
+  .sources,
+  .cta,
+  .footer {
+    margin-top: 22px;
+  }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 12px;
+  }
+
+  .annual {
+    border: 1px solid rgba(14, 165, 233, 0.24);
+    background: rgba(14, 165, 233, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .annual strong {
+    display: block;
+    margin-top: 6px;
+    color: var(--text-strong);
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.55rem;
+  }
+
+  .chart {
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .bar-row {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 120px 1fr 62px;
+    gap: 10px;
+    align-items: center;
+    font-size: 0.8rem;
+  }
+
+  .bar-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(51, 65, 85, 0.8);
+    overflow: hidden;
+  }
+
+  .bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--primary), var(--teal));
+  }
+
+  .compliance ul {
+    margin-top: 12px;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+  }
+
+  .check {
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: rgba(16, 185, 129, 0.08);
+    color: #34d399;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .refs {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+    font-size: 0.9rem;
+  }
+
+  .ref {
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: rgba(15, 23, 42, 0.35);
+  }
+
+  body.light .ref { background: rgba(248, 250, 252, 0.85); }
+
+  .suppliers-grid {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  .supplier-pill {
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    gap: 8px;
+  }
+
+  .approved {
+    color: #22c55e;
+    font-weight: 700;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .cta {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(0, 186, 167, 0.12));
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-radius: 16px;
+    padding: 22px;
+    text-align: center;
+  }
+
+  .cta p { color: var(--text-strong); font-weight: 600; }
+
+  .cta a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .footer {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .row-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .download {
+    border: 1px solid rgba(14, 165, 233, 0.35);
+    background: rgba(14, 165, 233, 0.12);
+    color: #38bdf8;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2,
+    .dash-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .header { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 620px) {
+    .container { padding: 20px 14px 56px; }
+    .hero, .card, .cta { padding: 16px; }
+    .bar-row { grid-template-columns: 94px 1fr 52px; }
+    .search-wrap { flex-direction: column; }
+    .search-wrap input { width: 100%; }
+    .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="brand">
+      <h1>Schoolgle <span>DealFind</span></h1>
+      <div class="subtitle">Smart procurement intelligence</div>
+    </div>
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark and light mode">Light Mode</button>
+  </header>
+
+  <section class="hero">
+    <h2>DealFind — Smart Procurement for Schools</h2>
+    <p>Paste a product link or search by name. We'll find you the best deal — and the compliance evidence to prove it.</p>
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="Paste a product URL or search by name..." aria-label="Search product or paste URL">
+      <button id="searchBtn" class="btn">Find Deals</button>
+    </div>
+    <div class="search-hint">Try: "whiteboard markers", "A4 paper", "classroom chairs".</div>
+  </section>
+
+  <section id="results" class="results">
+    <div class="grid-2">
+      <article class="card">
+        <div class="section-title">Searched Product</div>
+        <div class="product-row">
+          <div class="product-image" id="productIcon">M</div>
+          <div>
+            <div class="label">Current purchase</div>
+            <h3 id="productName" style="color: var(--text-strong); margin-top: 4px;">Whiteboard markers pack of 100</h3>
+            <div class="price" id="currentPrice">£24.99 <small>Generic supplier</small></div>
+          </div>
+        </div>
+        <span class="tag tag-blue" id="unitInfo">Unit cost: £0.25 per marker</span>
+      </article>
+
+      <article class="card">
+        <div class="section-title">Alternatives Found</div>
+        <div id="alternatives" class="alts-grid"></div>
+      </article>
+    </div>
+
+    <section class="dashboard card">
+      <div class="section-title">Savings Dashboard</div>
+      <div class="dash-grid">
+        <div class="annual">
+          <div class="label">Estimated annual savings</div>
+          <strong id="annualSaving">£1,920</strong>
+          <div class="muted" id="savingBreakdown">Based on 12 orders/year and current product pricing.</div>
+          <div class="tag tag-green" style="margin-top: 12px;">Schools using DealFind have saved an average of £4,200 per year</div>
+        </div>
+        <div class="chart">
+          <div class="label">Potential savings by category</div>
+          <div class="bar-row">
+            <span>Stationery</span>
+            <div class="bar-track"><div class="bar" id="barStationery" style="width: 78%;"></div></div>
+            <span id="barStationeryValue">£1.9k</span>
+          </div>
+          <div class="bar-row">
+            <span>Paper</span>
+            <div class="bar-track"><div class="bar" id="barPaper" style="width: 52%;"></div></div>
+            <span id="barPaperValue">£1.2k</span>
+          </div>
+          <div class="bar-row">
+            <span>Furniture</span>
+            <div class="bar-track"><div class="bar" id="barFurniture" style="width: 86%;"></div></div>
+            <span id="barFurnitureValue">£4.1k</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="compliance card">
+      <div class="section-title">Your Procurement Compliance Evidence</div>
+      <div class="refs">
+        <div class="ref"><strong>UK Procurement Act 2023 (effective February 2025)</strong><br>Schools are contracting authorities and must demonstrate best value when awarding contracts.</div>
+        <div class="ref"><strong>DfE Financial Handbook</strong><br>Schools must ensure best value, maintain an audit trail, and document procurement decisions.</div>
+        <div class="ref"><strong>Spending thresholds</strong><br>Social services: <strong>£213,757</strong> | Goods: <strong>£426,514</strong></div>
+      </div>
+      <div class="row-actions">
+        <button class="download" type="button">Download Evidence Pack</button>
+      </div>
+      <ul>
+        <li class="check">✅ Price comparison documented</li>
+        <li class="check">✅ Alternative suppliers considered</li>
+        <li class="check">✅ Best value demonstrated</li>
+        <li class="check">✅ Audit trail maintained</li>
+      </ul>
+    </section>
+
+    <section class="sources card">
+      <div class="section-title">Supplier Sources</div>
+      <div class="suppliers-grid" id="supplierSources"></div>
+    </section>
+
+    <section class="cta">
+      <p>DealFind is free for all schools with a Schoolgle Signal subscription.</p>
+      <p style="margin-top: 8px;"><a href="https://schoolgle.co.uk" target="_blank" rel="noopener noreferrer">schoolgle.co.uk</a></p>
+    </section>
+
+    <footer class="footer">
+      Schoolgle DealFind demo tool for headteacher procurement review.
+    </footer>
+  </section>
+</div>
+
+<script>
+  const productData = {
+    markers: {
+      name: 'Whiteboard markers pack of 100',
+      icon: 'M',
+      currentPrice: 24.99,
+      currentSupplier: 'Generic supplier',
+      unitLabel: 'Unit cost: £0.25 per marker',
+      ordersPerYear: 12,
+      categoryBars: { stationery: 78, paper: 52, furniture: 33 },
+      alternatives: [
+        { supplier: 'ESPO', price: 18.50, unit: '£0.19/marker', dfe: true },
+        { supplier: 'YPO', price: 19.20, unit: '£0.19/marker', dfe: true },
+        { supplier: 'Amazon Business', price: 16.99, unit: '£0.17/marker', dfe: false },
+        { supplier: 'TTS Group', price: 21.50, unit: '£0.22/marker', dfe: false },
+        { supplier: 'Hope Education', price: 20.75, unit: '£0.21/marker', dfe: false }
+      ]
+    },
+    paper: {
+      name: 'A4 Paper 5 reams',
+      icon: 'P',
+      currentPrice: 28.99,
+      currentSupplier: 'Generic supplier',
+      unitLabel: 'Unit cost: £5.80 per ream',
+      ordersPerYear: 24,
+      categoryBars: { stationery: 43, paper: 69, furniture: 36 },
+      alternatives: [
+        { supplier: 'YPO', price: 22.50, unit: '£4.50/ream', dfe: true },
+        { supplier: 'ESPO', price: 23.75, unit: '£4.75/ream', dfe: true },
+        { supplier: 'Lyreco', price: 21.99, unit: '£4.40/ream', dfe: false },
+        { supplier: 'Amazon Business', price: 19.99, unit: '£4.00/ream', dfe: false }
+      ]
+    },
+    chairs: {
+      name: 'Classroom chairs pack of 30',
+      icon: 'C',
+      currentPrice: 899.00,
+      currentSupplier: 'Generic supplier',
+      unitLabel: 'Unit cost: £29.97 per chair',
+      ordersPerYear: 3,
+      categoryBars: { stationery: 18, paper: 22, furniture: 86 },
+      alternatives: [
+        { supplier: 'ESPO', price: 745.00, unit: '£24.83/chair', dfe: true },
+        { supplier: 'Findel Education', price: 780.00, unit: '£26.00/chair', dfe: true },
+        { supplier: 'GLS Educational', price: 695.00, unit: '£23.17/chair', dfe: false }
+      ]
+    }
+  };
+
+  const suppliers = [
+    { name: 'ESPO', approved: true },
+    { name: 'YPO', approved: true },
+    { name: 'CPC', approved: true },
+    { name: 'Findel Education', approved: true },
+    { name: 'Amazon Business', approved: false },
+    { name: 'TTS Group', approved: false },
+    { name: 'Hope Education', approved: false },
+    { name: 'Consortium UK', approved: false },
+    { name: 'GLS Educational', approved: false },
+    { name: 'Lyreco', approved: false }
+  ];
+
+  const formatGBP = (n) => `£${n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatGBPShort = (n) => `£${(n / 1000).toFixed(1)}k`;
+
+  const elements = {
+    searchInput: document.getElementById('searchInput'),
+    searchBtn: document.getElementById('searchBtn'),
+    results: document.getElementById('results'),
+    productIcon: document.getElementById('productIcon'),
+    productName: document.getElementById('productName'),
+    currentPrice: document.getElementById('currentPrice'),
+    unitInfo: document.getElementById('unitInfo'),
+    alternatives: document.getElementById('alternatives'),
+    annualSaving: document.getElementById('annualSaving'),
+    savingBreakdown: document.getElementById('savingBreakdown'),
+    barStationery: document.getElementById('barStationery'),
+    barPaper: document.getElementById('barPaper'),
+    barFurniture: document.getElementById('barFurniture'),
+    barStationeryValue: document.getElementById('barStationeryValue'),
+    barPaperValue: document.getElementById('barPaperValue'),
+    barFurnitureValue: document.getElementById('barFurnitureValue'),
+    supplierSources: document.getElementById('supplierSources'),
+    themeToggle: document.getElementById('themeToggle')
+  };
+
+  function chooseDataset(query) {
+    const q = (query || '').toLowerCase();
+    if (q.includes('paper') || q.includes('a4')) return productData.paper;
+    if (q.includes('chair') || q.includes('furniture')) return productData.chairs;
+    return productData.markers;
+  }
+
+  function calculateSavings(product) {
+    const best = product.alternatives.reduce((min, item) => item.price < min.price ? item : min, product.alternatives[0]);
+    const annualSaving = Math.max((product.currentPrice - best.price) * product.ordersPerYear, 0);
+    return { best, annualSaving };
+  }
+
+  function buildAlternativeCard(item, currentPrice, isBest) {
+    const savingValue = Math.max(currentPrice - item.price, 0);
+    const savingPct = currentPrice > 0 ? Math.round((savingValue / currentPrice) * 100) : 0;
+    return `
+      <article class="alt ${isBest ? 'best' : ''}">
+        ${isBest ? '<span class="best-badge">Best deal</span>' : ''}
+        <h4>${item.supplier}</h4>
+        <div class="price" style="font-size:1.4rem; margin-top: 6px;">${formatGBP(item.price)}</div>
+        <div class="muted">${item.unit}</div>
+        <div class="saving">Save ${formatGBP(savingValue)} (${savingPct}%)</div>
+        <span class="tag ${item.dfe ? 'tag-green' : 'tag-neutral'}" style="margin-top: 8px;">
+          ${item.dfe ? 'DfE Framework approved ✅' : 'Open-market supplier'}
+        </span>
+      </article>
+    `;
+  }
+
+  function renderSupplierSources() {
+    elements.supplierSources.innerHTML = suppliers.map((supplier) => `
+      <div class="supplier-pill">
+        <span>${supplier.name}</span>
+        ${supplier.approved ? '<span class="approved">DfE Approved ✅</span>' : '<span class="muted">Supplier</span>'}
+      </div>
+    `).join('');
+  }
+
+  function render(product) {
+    const { best, annualSaving } = calculateSavings(product);
+
+    elements.productIcon.textContent = product.icon;
+    elements.productName.textContent = product.name;
+    elements.currentPrice.innerHTML = `${formatGBP(product.currentPrice)} <small>${product.currentSupplier}</small>`;
+    elements.unitInfo.textContent = product.unitLabel;
+
+    elements.alternatives.innerHTML = product.alternatives
+      .map((option) => buildAlternativeCard(option, product.currentPrice, option.supplier === best.supplier))
+      .join('');
+
+    elements.annualSaving.textContent = formatGBP(annualSaving);
+    elements.savingBreakdown.textContent = `Based on ${product.ordersPerYear} orders/year and current product pricing.`;
+
+    const station = Math.round((annualSaving * product.categoryBars.stationery) / 100);
+    const paper = Math.round((annualSaving * product.categoryBars.paper) / 100);
+    const furniture = Math.round((annualSaving * product.categoryBars.furniture) / 100);
+
+    elements.barStationery.style.width = `${product.categoryBars.stationery}%`;
+    elements.barPaper.style.width = `${product.categoryBars.paper}%`;
+    elements.barFurniture.style.width = `${product.categoryBars.furniture}%`;
+
+    elements.barStationeryValue.textContent = formatGBPShort(station || 1000);
+    elements.barPaperValue.textContent = formatGBPShort(paper || 900);
+    elements.barFurnitureValue.textContent = formatGBPShort(furniture || 1200);
+
+    elements.results.classList.add('show');
+  }
+
+  function runSearch() {
+    const product = chooseDataset(elements.searchInput.value.trim());
+    render(product);
+  }
+
+  elements.searchBtn.addEventListener('click', runSearch);
+  elements.searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') runSearch();
+  });
+
+  elements.themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    elements.themeToggle.textContent = document.body.classList.contains('light') ? 'Dark Mode' : 'Light Mode';
+  });
+
+  renderSupplierSources();
+</script>
+</body>
+</html>
